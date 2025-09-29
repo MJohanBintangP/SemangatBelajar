@@ -52,7 +52,7 @@ export default function ArtikelGrid({ limit = 8, isDashboard = false }: ArtikelG
   const isArtikelPage = location.pathname === '/Artikel';
 
   useEffect(() => {
-    fetch('https://api.ecosteps.site/api/artikel')
+    fetch('http://localhost:8081/api/artikel')
       .then((res) => res.json())
       .then((data) => {
         const all = Array.isArray(data.articles) ? data.articles : [];

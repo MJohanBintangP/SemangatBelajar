@@ -13,7 +13,7 @@ export default function ForumBox() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('https://api.ecosteps.site/api/forum')
+    fetch('http://localhost:8081/api/forum')
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setForums(data);

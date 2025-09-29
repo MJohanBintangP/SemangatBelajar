@@ -27,24 +27,24 @@ export default function Tantangan() {
   };
 
   useEffect(() => {
-    fetch('https://api.ecosteps.site/api/tantangan/hari-ini')
+    fetch('http://localhost:8081/api/tantangan/hari-ini')
       .then((res) => res.json())
       .then((data) => setTasks(Array.isArray(data) ? data : []));
 
     const token = localStorage.getItem('token');
-    fetch('https://api.ecosteps.site/api/user/poin', {
+    fetch('http://localhost:8081/api/user/poin', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTotalPoin(data.poin || 0));
 
-    fetch('https://api.ecosteps.site/api/tantangan/selesai-hari-ini', {
+    fetch('http://localhost:8081/api/tantangan/selesai-hari-ini', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setCompleted(Array.isArray(data) ? data : []));
 
-    fetch('https://api.ecosteps.site/api/leaderboard')
+    fetch('http://localhost:8081/api/leaderboard')
       .then((res) => res.json())
       .then((data) => {
         const processedData = Array.isArray(data)
@@ -60,7 +60,7 @@ export default function Tantangan() {
   function handleCheck(tantangan: Tantangan) {
     if (completed.includes(tantangan.id)) return;
     const token = localStorage.getItem('token');
-    fetch('https://api.ecosteps.site/api/tantangan/selesai', {
+    fetch('http://localhost:8081/api/tantangan/selesai', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

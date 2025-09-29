@@ -34,7 +34,7 @@ export default function Forum() {
 
   function fetchForum() {
     setLoading(true);
-    fetch('https://api.ecosteps.site/api/forum')
+    fetch('http://localhost:8081/api/forum')
       .then((res) => res.json())
       .then((data) => {
         setPosts(Array.isArray(data) ? data : []);
@@ -55,7 +55,7 @@ export default function Forum() {
       return;
     }
     try {
-      const res = await fetch('https://api.ecosteps.site/api/forum', {
+      const res = await fetch('http://localhost:8081/api/forum', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ judul, isi }),
@@ -76,7 +76,7 @@ export default function Forum() {
 
   async function handleComment(postId: number) {
     if (!commentIsi[postId] || !commentIsi[postId].trim()) return;
-    await fetch(`https://api.ecosteps.site/api/forum/${postId}/comment`, {
+    await fetch(`http://localhost:8081/api/forum/${postId}/comment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -24,7 +24,7 @@ export default function Laporan() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    fetch('https://api.ecosteps.site/api/laporan/user', {
+    fetch('http://localhost:8081/api/laporan/user', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -40,7 +40,7 @@ export default function Laporan() {
     const token = localStorage.getItem('token');
     if (!token) return;
     setLoading(true);
-    fetch('https://api.ecosteps.site/api/laporan/user', {
+    fetch('http://localhost:8081/api/laporan/user', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

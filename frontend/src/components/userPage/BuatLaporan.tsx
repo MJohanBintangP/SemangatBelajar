@@ -30,7 +30,7 @@ export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
     setPesan('');
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('https://api.ecosteps.site/api/laporan', {
+      const res = await fetch('http://localhost:8081/api/laporan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

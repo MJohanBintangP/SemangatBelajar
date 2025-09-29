@@ -14,7 +14,7 @@ export default function TantanganAktif() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('https://api.ecosteps.site/api/tantangan/hari-ini')
+    fetch('http://localhost:8081/api/tantangan/hari-ini')
       .then((res) => res.json())
       .then((data) => {
         setTasks(Array.isArray(data) ? data : []);
