@@ -78,3 +78,5 @@ coverage.html
 
 # Local development files
 *.local
+
+main.exe

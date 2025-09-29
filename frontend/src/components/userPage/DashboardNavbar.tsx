@@ -15,7 +15,7 @@ export default function DashboardNavbar() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-    fetch('https://api.ecosteps.site/api/user/profile', {
+    fetch('http://localhost:8081/api/user/profile', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

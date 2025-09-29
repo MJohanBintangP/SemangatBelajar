@@ -15,7 +15,7 @@ export default function Dashboard() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    fetch('https://api.ecosteps.site/api/user/profile', {
+    fetch('http://localhost:8081/api/user/profile', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -24,19 +24,19 @@ export default function Dashboard() {
       })
       .catch(() => setUsername(''));
 
-    fetch('https://api.ecosteps.site/api/tantangan/selesai-hari-ini', {
+    fetch('http://localhost:8081/api/tantangan/selesai-hari-ini', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTantanganSelesai(Array.isArray(data) ? data.length : 0));
 
-    fetch('https://api.ecosteps.site/api/user/poin', {
+    fetch('http://localhost:8081/api/user/poin', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTotalPoin(data.poin || 0));
 
-    fetch('https://api.ecosteps.site/api/laporan/user', {
+    fetch('http://localhost:8081/api/laporan/user', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

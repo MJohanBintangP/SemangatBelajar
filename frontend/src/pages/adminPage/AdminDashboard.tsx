@@ -53,7 +53,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      const resLaporan = await fetch('https://api.ecosteps.site/api/laporan/all', {
+      const resLaporan = await fetch('http://localhost:8081/api/laporan/all', {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
       const dataLaporan = await resLaporan.json();
       setLaporan(Array.isArray(dataLaporan) ? dataLaporan : []);
 
-      const resUser = await fetch(`https://api.ecosteps.site/api/user/all?t=${Date.now()}`, {
+      const resUser = await fetch(`http://localhost:8081/api/user/all?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
       const dataUser = await resUser.json();
       setUsers(Array.isArray(dataUser) ? dataUser : []);
 
-      const resForum = await fetch(`https://api.ecosteps.site/api/forum?t=${Date.now()}`, {
+      const resForum = await fetch(`http://localhost:8081/api/forum?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
   async function updateStatus(id: number, status: string) {
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('https://api.ecosteps.site/api/laporan/update', {
+    const res = await fetch('http://localhost:8081/api/laporan/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Yakin ingin menghapus laporan ini?')) return;
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('https://api.ecosteps.site/api/laporan/delete', {
+    const res = await fetch('http://localhost:8081/api/laporan/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Yakin ingin menghapus forum ini?')) return;
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('https://api.ecosteps.site/api/forum/delete', {
+    const res = await fetch('http://localhost:8081/api/forum/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

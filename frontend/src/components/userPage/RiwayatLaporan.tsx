@@ -20,7 +20,7 @@ export default function RiwayatLaporan() {
     if (!token) return;
 
     setLoading(true);
-    fetch('https://api.ecosteps.site/api/laporan/user', {
+    fetch('http://localhost:8081/api/laporan/user', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.status === 401 ? [] : res.json()))
