@@ -3,6 +3,7 @@ import DashboardNavbar from '../../components/userPage/DashboardNavbar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import ilustrasiLayout from '../../assets/ilustrasiLayout.svg';
 
+
 export default function LayoutDashboard() {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const navigate = useNavigate();

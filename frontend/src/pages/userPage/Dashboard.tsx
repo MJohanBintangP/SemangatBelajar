@@ -3,6 +3,7 @@ import QuickActions from '../../components/userPage/QuickActions';
 import RiwayatLaporan from '../../components/userPage/RiwayatLaporan';
 import TantanganAktif from '../../components/userPage/TantanganAktif';
 import ArtikelGrid from './Artikel';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dashboard() {
   const [username, setUsername] = useState('');
@@ -15,7 +16,7 @@ export default function Dashboard() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    fetch('http://localhost:8081/api/user/profile', {
+    fetch(`${API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -24,19 +25,19 @@ export default function Dashboard() {
       })
       .catch(() => setUsername(''));
 
-    fetch('http://localhost:8081/api/tantangan/selesai-hari-ini', {
+    fetch(`${API_BASE_URL}/api/tantangan/selesai-hari-ini`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTantanganSelesai(Array.isArray(data) ? data.length : 0));
 
-    fetch('http://localhost:8081/api/user/poin', {
+    fetch(`${API_BASE_URL}/api/user/poin`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTotalPoin(data.poin || 0));
 
-    fetch('http://localhost:8081/api/laporan/user', {
+    fetch(`${API_BASE_URL}/api/laporan/user`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

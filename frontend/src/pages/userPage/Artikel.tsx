@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type Article = {
   title: string;
@@ -52,7 +53,7 @@ export default function ArtikelGrid({ limit = 8, isDashboard = false }: ArtikelG
   const isArtikelPage = location.pathname === '/Artikel';
 
   useEffect(() => {
-    fetch('http://localhost:8081/api/artikel')
+    fetch(`${API_BASE_URL}/api/artikel`)
       .then((res) => res.json())
       .then((data) => {
         const all = Array.isArray(data.articles) ? data.articles : [];

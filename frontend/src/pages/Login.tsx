@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 import ilustrasiLogin from '../assets/ilustrasilogin.svg';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:8081/api/login', {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -58,6 +59,14 @@ export default function Login() {
             Belum punya akun?{' '}
             <span className="text-[#008207] hover:underline cursor-pointer" onClick={() => navigate('/Register')}>
               Daftar
+            </span>
+          </p>
+          <p className="text-sm text-[#454545] mb-4">
+            Lupa password?{' '}
+            <span 
+                className="text-[#008207] hover:underline cursor-pointer" 
+                onClick={() => navigate('/reset-password')}
+              > Reset password
             </span>
           </p>
           <button type="submit" className="cursor-pointer hover:bg-green-700 duration-200 transition-colors w-fit bg-[#25E82F] text-white px-8 py-2 rounded-full font-semibold mt-4">

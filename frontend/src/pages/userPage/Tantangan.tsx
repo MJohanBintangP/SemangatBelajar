@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import ilustrasiRank from '../../assets/ilustrasiRank.svg';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type Tantangan = {
   id: number;
@@ -27,24 +28,24 @@ export default function Tantangan() {
   };
 
   useEffect(() => {
-    fetch('http://localhost:8081/api/tantangan/hari-ini')
+    fetch(`${API_BASE_URL}/api/tantangan/hari-ini`)
       .then((res) => res.json())
       .then((data) => setTasks(Array.isArray(data) ? data : []));
 
     const token = localStorage.getItem('token');
-    fetch('http://localhost:8081/api/user/poin', {
+    fetch(`${API_BASE_URL}/api/user/poin`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTotalPoin(data.poin || 0));
 
-    fetch('http://localhost:8081/api/tantangan/selesai-hari-ini', {
+    fetch(`${API_BASE_URL}/api/tantangan/selesai-hari-ini`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setCompleted(Array.isArray(data) ? data : []));
 
-    fetch('http://localhost:8081/api/leaderboard')
+    fetch(`${API_BASE_URL}/api/leaderboard`)
       .then((res) => res.json())
       .then((data) => {
         const processedData = Array.isArray(data)
@@ -60,7 +61,7 @@ export default function Tantangan() {
   function handleCheck(tantangan: Tantangan) {
     if (completed.includes(tantangan.id)) return;
     const token = localStorage.getItem('token');
-    fetch('http://localhost:8081/api/tantangan/selesai', {
+    fetch(`${API_BASE_URL}/api/tantangan/selesai`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
