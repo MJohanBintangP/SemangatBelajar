@@ -24,7 +24,7 @@ import (
 const (
 	otplength    = 6
 	maxAttempts  = 5
-	otpExpirySec = 60
+	otpExpirySec = 120
 )
 
 // RequestPasswordResetOTP mengirim OTP ke email
@@ -213,7 +213,7 @@ func sendOTPEmail(toEmail, otp string) error {
     <span class="otp-code">%s</span>
   </p>
 
-  <p>Kode ini berlaku selama <strong>60 detik</strong>.</p>
+  <p>Kode ini berlaku selama <strong>2 Menit</strong>.</p>
 
   <p>Jika Anda tidak meminta reset password, abaikan email ini.</p>
 

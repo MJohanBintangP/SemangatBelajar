@@ -103,7 +103,7 @@ func sendEmailVerification(toEmail, otp string) error {
 	  <p>Halo,</p>
 	  <p>Kode verifikasi akun Anda adalah:</p>
 	  <p class="otp-code">%s</p>
-	  <p>Kode ini berlaku selama <strong>40 detik</strong>.</p>
+	  <p>Kode ini berlaku selama <strong>5 Menit</strong>.</p>
 	</body>
 	</html>
 	`, otp)
@@ -224,7 +224,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Email:     req.Email,
 		Password:  req.Password,
 		OTP:       otp,
-		ExpiresAt: time.Now().Add(40 * time.Second),
+		ExpiresAt: time.Now().Add(360 * time.Second),
 	}
 	pendingRegistrationsMutex.Unlock()
 
