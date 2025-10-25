@@ -5,32 +5,29 @@ import logoNavbar from '../../assets/navbarLogo.svg';
 import * as Phospor from '@phosphor-icons/react';
 import NotePencil from '../../assets/NotePencil.svg';
 
-export default function DashboardNavbar({ username, email }: { username?: string; email?: string } = {}) {
+export default function DashboardNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [usernameState, setUsernameState] = useState(username || '');
-  const [emailState, setEmailState] = useState(email || '');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
 
-  // Fetch profile only if parent didn't provide username/email
   useEffect(() => {
-    if (username || email) return;
     const token = localStorage.getItem('token');
     if (!token) return;
-
     fetch('http://localhost:8081/api/user/profile', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => {
-        setUsernameState(data.username || '');
-        setEmailState(data.email || '');
+        setUsername(data.username || '');
+        setEmail(data.email || '');
       })
       .catch(() => {
-        setUsernameState('');
-        setEmailState('');
+        setUsername('');
+        setEmail('');
       });
-  }, [username, email]);
+  }, []);
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -44,12 +41,12 @@ export default function DashboardNavbar({ username, email }: { username?: string
     <div className="flex flex-col h-full">
       {/* Logo & Profil */}
       <div className="flex-shrink-0">
-        <img src={logoNavbar} alt="logoNavbar" className="mb-6" loading="lazy" />
+        <img src={logoNavbar} alt="logoNavbar" className="mb-6" />
         <div className="flex gap-6 items-center justify-start pl-7 mb-6">
-          <img src={Profile} alt="Profile" className="w-12 rounded-full" loading="lazy" />
+          <img src={Profile} alt="Profile" className="w-12 rounded-full" />
           <div className="flex flex-col justify-center">
-            <div className="font-bold">{usernameState || '...'}</div>
-            <div className="text-xs text-[#9D9D9D]">{emailState || '...'}</div>
+            <div className="font-bold">{username || '...'}</div>
+            <div className="text-xs text-[#9D9D9D]">{email || '...'}</div>
           </div>
         </div>
       </div>
@@ -84,7 +81,7 @@ export default function DashboardNavbar({ username, email }: { username?: string
                 <button className="cursor-pointer text-xs text-[#009B08] bg-white rounded-md px-5 py-1 font-medium">lapor</button>
               </Link>
             </div>
-            <img className="ml-auto bottom-26 absolute left-35" src={NotePencil} alt="NotePencil" loading="lazy" />
+            <img className="ml-auto bottom-26 absolute left-35" src={NotePencil} alt="NotePencil" />
           </div>
         </div>
 

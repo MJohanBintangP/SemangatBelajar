@@ -34,7 +34,7 @@ export default function Navbar() {
       {/* Mobile/Tablet Header */}
       {isMobile && (
         <div className="flex justify-between items-center px-6 py-4 bg-black/90 backdrop-blur-md">
-          <img className="w-20" src={logo} alt="logo" loading="lazy" />
+          <img className="w-20" src={logo} alt="logo" />
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-2">
             {isMenuOpen ? <XIcon size={24} weight="bold" /> : <ListIcon size={24} weight="bold" />}
           </button>
@@ -83,7 +83,7 @@ export default function Navbar() {
           <div className="flex fixed w-auto justify-center items-center p-4 bg-black/20 rounded-full backdrop-blur-[30.6px] shadow-lg">
             <div className="flex justify-between items-center gap-20 pl-8">
               <div className="flex items-center gap-10">
-                <img className="w-25" src={logo} alt="logo" loading="lazy" />
+                <img className="w-25" src={logo} alt="logo" />
                 <ul>
                   <li className="group inline-flex items-center gap-2 mr-6 cursor-pointer">
                     <a onClick={() => scrollToSection('hero')} className="text-white font-medium transition-colors duration-150 group-hover:text-[#25E82F] cursor-pointer">
