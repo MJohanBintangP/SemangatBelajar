@@ -7,35 +7,29 @@ import * as Phospor from '@phosphor-icons/react';
 type AdminNavbarProps = {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  username?: string;
-  email?: string;
 };
 
-export default function AdminNavbar({ activeTab, setActiveTab, username, email }: AdminNavbarProps) {
+export default function AdminNavbar({ activeTab, setActiveTab }: AdminNavbarProps) {
   const navigate = useNavigate();
-  // If parent passes username/email, use them; otherwise maintain internal state and fetch
-  const [usernameState, setUsernameState] = useState(username || '');
-  const [emailState, setEmailState] = useState(email || '');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
 
-  // Fetch profile only if parent didn't provide username/email
   useEffect(() => {
-    if (username || email) return; // parent provided, skip fetch
     const token = localStorage.getItem('token');
     if (!token) return;
-
     fetch('http://localhost:8081/api/user/profile', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => {
-        setUsernameState(data.username || '');
-        setEmailState(data.email || '');
+        setUsername(data.username || '');
+        setEmail(data.email || '');
       })
       .catch(() => {
-        setUsernameState('');
-        setEmailState('');
+        setUsername('');
+        setEmail('');
       });
-  }, [username, email]);
+  }, []);
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -47,12 +41,12 @@ export default function AdminNavbar({ activeTab, setActiveTab, username, email }
     <div className="flex flex-col h-full">
       {/* Logo & Profil */}
       <div className="flex-shrink-0">
-  <img src={logoNavbar} alt="logoNavbar" className="mb-6" loading="lazy" />
+        <img src={logoNavbar} alt="logoNavbar" className="mb-6" />
         <div className="flex gap-6 items-center justify-start pl-7 mb-6">
-          <img src={Profile} alt="Profile" className="w-12 rounded-full" loading="lazy" />
+          <img src={Profile} alt="Profile" className="w-12 rounded-full" />
           <div className="flex flex-col justify-center">
-            <div className="font-bold">{usernameState || '...'}</div>
-            <div className="text-xs text-[#9D9D9D]">{emailState || '...'}</div>
+            <div className="font-bold">{username || '...'}</div>
+            <div className="text-xs text-[#9D9D9D]">{email || '...'}</div>
             <div className="text-xs font-medium text-green-600">Administrator</div>
           </div>
         </div>

@@ -93,23 +93,7 @@ export default function Tantangan() {
         </div>
 
         <div className="bg-[#25E82F]/9 rounded-3xl p-6 flex relative overflow-hidden">
-          {/* Mobile: stacked leaderboard list */}
-          <div className="block lg:hidden w-full">
-            <div className="space-y-3">
-              {leaderboard.map((user, idx) => (
-                <div key={user.email} className="bg-white rounded-lg p-3 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="font-bold text-lg">#{idx + 1}</div>
-                    <div className="font-medium">{user.username}</div>
-                  </div>
-                  <div className="font-semibold">{user.poin} pts</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Desktop table for large screens */}
-          <div className="hidden lg:block z-10 w-full">
+          <div className="z-10">
             <table className="w-full">
               <thead>
                 <tr className="text-left">
@@ -129,12 +113,10 @@ export default function Tantangan() {
               </tbody>
             </table>
           </div>
-
           <div className="absolute right-12 -bottom-5 h-full flex items-end">
             <img
               src={ilustrasiRank}
               alt="Leaderboard"
-              loading="lazy"
               className="w-80 object-contain"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';

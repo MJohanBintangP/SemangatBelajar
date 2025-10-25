@@ -65,7 +65,7 @@ export default function Login() {
           </button>
         </form>
       </div>
-  <img className="hidden lg:block relative -right-25" src={ilustrasiLogin} alt="ilustrasiLogin" loading="lazy" />
+      <img className="hidden lg:block relative -right-25" src={ilustrasiLogin} alt="ilustrasiLogin" />
     </div>
   );
 }
