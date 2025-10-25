@@ -10,24 +10,28 @@ import Tantangan from './pages/userPage/Tantangan';
 import Forum from './pages/userPage/Forum';
 import Artikel from './pages/userPage/Artikel';
 
+import { UserProvider } from './contexts/UserContext';
+
 function App() {
   return (
     <div className="font-[poppins]">
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="/Register" element={<Register />} />
-          <Route path="/AdminDashboard" element={<AdminDashboard />} />
-          <Route path="/" element={<LayoutDashboard />}>
-            <Route path="Dashboard" element={<Dashboard />} />
-            <Route path="Laporan" element={<Laporan />} />
-            <Route path="Tantangan" element={<Tantangan />} />
-            <Route path="Forum" element={<Forum />} />
-            <Route path="Artikel" element={<Artikel />} />
-          </Route>
-        </Routes>
-      </Router>
+      <UserProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/Login" element={<Login />} />
+            <Route path="/Register" element={<Register />} />
+            <Route path="/AdminDashboard" element={<AdminDashboard />} />
+            <Route path="/" element={<LayoutDashboard />}>
+              <Route path="Dashboard" element={<Dashboard />} />
+              <Route path="Laporan" element={<Laporan />} />
+              <Route path="Tantangan" element={<Tantangan />} />
+              <Route path="Forum" element={<Forum />} />
+              <Route path="Artikel" element={<Artikel />} />
+            </Route>
+          </Routes>
+        </Router>
+      </UserProvider>
     </div>
   );
 }

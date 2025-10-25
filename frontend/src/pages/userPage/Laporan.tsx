@@ -78,8 +78,43 @@ export default function Laporan() {
           <div className="text-gray-500 text-lg text-center">Buat laporan pertamamu terlebih dahulu !</div>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl shadow">
-          <table className="min-w-full bg-white rounded-2xl">
+        <>
+          {/* Mobile: stacked cards for small screens */}
+          <div className="block lg:hidden space-y-4">
+            {riwayat.map((laporan, idx) => (
+              <div key={laporan.id} className="bg-white rounded-lg shadow p-4 border">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="font-semibold">{laporan.judul}</div>
+                    <div className="text-xs text-gray-600 mt-1">{laporan.deskripsi}</div>
+                    <div className="text-xs text-gray-500 mt-2">Lokasi: {laporan.lokasi ?? '-'}</div>
+                  </div>
+                  <div className="text-right ml-4 flex-shrink-0">
+                    <div className="text-xs text-gray-500">No: {idx + 1}</div>
+                    <div className="text-sm font-semibold mt-2">{laporan.status}</div>
+                    <div className="text-xs text-gray-500 mt-1">{new Date(laporan.created_at).toLocaleString()}</div>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {laporan.foto_url && (
+                    <a href={laporan.foto_url} target="_blank" rel="noopener noreferrer" className="text-[#005EFF] block text-xs">
+                      Lihat foto
+                    </a>
+                  )}
+                  {laporan.video_url && (
+                    <a href={laporan.video_url} target="_blank" rel="noopener noreferrer" className="text-[#005EFF] block text-xs">
+                      Lihat video
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop/table for large screens */}
+          <div className="hidden lg:block overflow-x-auto rounded-2xl shadow">
+            <table className="min-w-full bg-white rounded-2xl">
             <thead>
               <tr>
                 <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-2xl">No</th>
@@ -117,6 +152,7 @@ export default function Laporan() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {showPopup && (

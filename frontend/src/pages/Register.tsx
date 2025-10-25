@@ -67,7 +67,7 @@ export default function Register() {
           </form>
         </div>
 
-        <img className="hidden lg:block relative -right-25" src={ilustrasiRegister} alt="ilustrasiRegister" />
+  <img className="hidden lg:block relative -right-25" src={ilustrasiRegister} alt="ilustrasiRegister" loading="lazy" />
       </div>
     </div>
   );

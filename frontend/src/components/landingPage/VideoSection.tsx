@@ -73,7 +73,7 @@ export default function VideoSection() {
         <div className="w-full relative aspect-video rounded-lg overflow-hidden mb-20">
           {!playing ? (
             <div className="w-full h-full relative group">
-              <img src={VIDEO_THUMB} alt="Video thumbnail" className="w-full h-full object-cover" draggable={false} />
+              <img src={VIDEO_THUMB} alt="Video thumbnail" loading="lazy" className="w-full h-full object-cover" draggable={false} />
               <div className="absolute inset-0 bg-black/30 transition"></div>
               <button
                 onClick={() => setPlaying(true)}

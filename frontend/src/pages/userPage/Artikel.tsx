@@ -75,7 +75,7 @@ export default function ArtikelGrid({ limit = 8, isDashboard = false }: ArtikelG
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {articles.map((a, idx) => (
           <a href={a.url} target="_blank" rel="noopener noreferrer" key={idx} className="block bg-white rounded-xl shadow hover:shadow-lg transition p-0 mb-4">
-            {a.urlToImage && <img src={a.urlToImage} alt={a.title} className="w-full h-32 object-cover rounded-t-xl" />}
+            {a.urlToImage && <img src={a.urlToImage} alt={a.title} loading="lazy" className="w-full h-32 object-cover rounded-t-xl" />}
             <div className="p-4">
               <div className="font-bold text-base mb-1 line-clamp-2">{a.title}</div>
               <div className="text-sm text-gray-700 mb-1 line-clamp-2">{a.description}</div>
