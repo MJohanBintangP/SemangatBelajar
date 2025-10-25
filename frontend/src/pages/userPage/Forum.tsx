@@ -132,7 +132,7 @@ export default function Forum() {
           <div className="text-center py-10 text-gray-500">Memuat data...</div>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-lg py-16">
-            <img src={ilustrasiEmpty} alt="Forum kosong" className="w-80 mb-6" />
+            <img src={ilustrasiEmpty} alt="Forum kosong" loading="lazy" className="w-80 mb-6" />
             <div className="text-2xl font-bold mb-2">Forum kosong</div>
             <div className="text-gray-500 text-lg text-center">Buat forum pertamamu terlebih dahulu!</div>
           </div>
