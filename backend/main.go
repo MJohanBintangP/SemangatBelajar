@@ -65,6 +65,7 @@ func main() {
 	mux.HandleFunc("/api/user/all", handlers.GetAllUsers)
 	mux.HandleFunc("/api/forum/delete", handlers.DeleteForum)
 	mux.HandleFunc("/api/user/delete", handlers.DeleteUser)
+	mux.HandleFunc("/api/user/update", handlers.UpdateUser)
 	mux.HandleFunc("/api/request-otp", handlers.RequestOTPHandler)
 	mux.HandleFunc("/api/verify-otp", handlers.VerifyOTPHandler)
 	mux.HandleFunc("/api/reset-password", handlers.ResetPasswordHandler)

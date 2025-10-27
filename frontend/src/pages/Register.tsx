@@ -21,10 +21,31 @@ export default function Register() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
       });
-      
+
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.message || 'Gagal daftar');
+        // Try to parse JSON error response first, fallback to plain text.
+        let errorMessage = 'Gagal daftar';
+        try {
+          const contentType = res.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const data = await res.json();
+            // If backend returns { message: '...' }
+            errorMessage = data?.message || (typeof data === 'string' ? data : JSON.stringify(data)) || errorMessage;
+          } else {
+            // Not JSON: read as text (e.g. "Password must be ...")
+            const text = await res.text();
+            errorMessage = text || errorMessage;
+          }
+        } catch {
+          // If parsing as json failed unexpectedly, try text as a last resort
+          try {
+            const text = await res.text();
+            errorMessage = text || errorMessage;
+          } catch {
+            // ignore - keep default
+          }
+        }
+        setError(errorMessage);
         return;
       }
 
@@ -50,51 +71,24 @@ export default function Register() {
             {error && <div className="mb-4 text-red-600">{error}</div>}
             <div className="mb-4">
               <h3 className="font-medium">Username</h3>
-              <input 
-                type="text" 
-                placeholder="usernameExample" 
-                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)} 
-                required 
-              />
+              <input type="text" placeholder="usernameExample" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={username} onChange={(e) => setUsername(e.target.value)} required />
             </div>
             <div className="mb-4">
               <h3 className="font-medium">Email</h3>
-              <input 
-                type="email" 
-                placeholder="name@example.com" 
-                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-              />
+              <input type="email" placeholder="name@example.com" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="mb-8">
               <h3 className="font-medium">Password</h3>
-              <input 
-                type="password" 
-                placeholder="passwordExample" 
-                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                required 
-              />
+              <input type="password" placeholder="passwordExample" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
 
             <p className="text-sm text-[#454545] mb-8">
               Sudah punya akun?{' '}
-              <span 
-                className="text-[#008207] hover:underline cursor-pointer" 
-                onClick={() => navigate('/Login')}
-              >
+              <span className="text-[#008207] hover:underline cursor-pointer" onClick={() => navigate('/Login')}>
                 Masuk
               </span>
             </p>
-            <button 
-              type="submit" 
-              className="cursor-pointer hover:bg-green-700 duration-200 transition-colors w-fit bg-[#25E82F] text-white px-8 py-2 rounded-full font-semibold"
-            >
+            <button type="submit" className="cursor-pointer hover:bg-green-700 duration-200 transition-colors w-fit bg-[#25E82F] text-white px-8 py-2 rounded-full font-semibold">
               Daftar
             </button>
           </form>

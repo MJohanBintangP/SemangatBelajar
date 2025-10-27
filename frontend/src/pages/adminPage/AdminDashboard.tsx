@@ -43,6 +43,39 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+  // Robust response parser: try res.json(), fallback to text when JSON parsing fails
+  async function parseResponse(res: Response): Promise<unknown> {
+    try {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        try {
+          return await res.json();
+        } catch {
+          // If res.json() fails (malformed JSON), try reading text and parsing manually
+          const txt = await res.text();
+          try {
+            return JSON.parse(txt);
+          } catch {
+            return txt;
+          }
+        }
+      }
+      // Not JSON according to header -> try text, and attempt JSON.parse anyway
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        return text;
+      }
+    } catch {
+      try {
+        return await res.text();
+      } catch {
+        return null;
+      }
+    }
+  }
+
   useEffect(() => {
     fetchAllData();
     const storedRole = localStorage.getItem('role');
@@ -67,21 +100,21 @@ export default function AdminDashboard() {
         navigate('/login');
         return;
       }
-      const dataLaporan = await resLaporan.json();
+      const dataLaporan = await parseResponse(resLaporan);
       setLaporan(Array.isArray(dataLaporan) ? dataLaporan : []);
 
       const resUser = await fetch(`${API_BASE_URL}/api/user/all?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
-      const dataUser = await resUser.json();
+      const dataUser = await parseResponse(resUser);
       setUsers(Array.isArray(dataUser) ? dataUser : []);
 
       const resForum = await fetch(`${API_BASE_URL}/api/forum?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
-      const dataForum = await resForum.json();
+      const dataForum = await parseResponse(resForum);
       setForums(Array.isArray(dataForum) ? dataForum : []);
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -101,9 +134,10 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id, status }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal update status');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal update status';
+      setPesan(msg);
       return;
     }
     setPesan('Status berhasil diupdate');
@@ -122,9 +156,10 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal menghapus laporan');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus laporan';
+      setPesan(msg);
       return;
     }
     setPesan('Laporan berhasil dihapus');
@@ -143,9 +178,10 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal menghapus forum');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus forum';
+      setPesan(msg);
       return;
     }
     setPesan('Forum berhasil dihapus');
@@ -168,7 +204,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Yakin ingin menghapus pengguna ini ?')) return;
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:8081/api/user/delete', {
+    const res = await fetch(`${API_BASE_URL}/api/user/delete`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -176,9 +212,10 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal menghapus user');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus user';
+      setPesan(msg);
       return;
     }
     setPesan('User berhasil dihapus');
@@ -189,7 +226,7 @@ export default function AdminDashboard() {
   async function handleSaveEditUser(id: number) {
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:8081/api/user/update', {
+    const res = await fetch(`${API_BASE_URL}/api/user/update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -197,9 +234,10 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id, username: editUsername, role: editRole }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal update user');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal update user';
+      setPesan(msg);
       return;
     }
     setPesan('User berhasil diupdate');

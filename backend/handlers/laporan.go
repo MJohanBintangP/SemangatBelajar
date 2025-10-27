@@ -82,9 +82,6 @@ func GetAllLaporan(w http.ResponseWriter, r *http.Request) {
 	})
 	claims, ok := token.Claims.(jwt.MapClaims)
 
-	log.Println("JWT claims:", claims)
-	log.Println("Role value:", claims["role"])
-
 	if !ok || !token.Valid || claims["role"] != "admin" {
 		writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
 		return
