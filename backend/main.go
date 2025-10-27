@@ -42,6 +42,7 @@ func main() {
 	http.HandleFunc("/api/user/all", handlers.GetAllUsers)
 	http.HandleFunc("/api/forum/delete", handlers.DeleteForum)
 	http.HandleFunc("/api/user/delete", handlers.DeleteUser)
+	http.HandleFunc("/api/user/update", handlers.UpdateUser)
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 	log.Println("Server running at :8081")

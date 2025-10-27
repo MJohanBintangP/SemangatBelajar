@@ -1,0 +1,23 @@
+{
+  "name": "semangatbelajar",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MJohanBintangP/SemangatBelajar.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MJohanBintangP/SemangatBelajar/issues"
+  },
+  "homepage": "https://github.com/MJohanBintangP/SemangatBelajar#readme",
+  "description": "",
+  "dependencies": {
+    "react": "^19.2.0"
+  }
+}
