@@ -185,22 +185,39 @@ func ForumHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-    enableCORS(w)
-    if r.Method != "POST" {
-        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-        return
-    }
-    var req struct{ ID int `json:"id"` }
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        http.Error(w, "Request tidak valid", http.StatusBadRequest)
-        return
-    }
-    _, err := config.DB.Exec(context.Background(), "DELETE FROM users WHERE id=$1", req.ID)
-    if err != nil {
-        http.Error(w, "Gagal menghapus user", http.StatusInternalServerError)
-        return
-    }
-    json.NewEncoder(w).Encode(map[string]string{"message": "User berhasil dihapus"})
+	enableCORS(w)
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct{ ID int `json:"id"` }
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Request tidak valid", http.StatusBadRequest)
+		return
+	}
+	// Hapus semua komentar yang dibuat user
+	_, _ = config.DB.Exec(context.Background(), "DELETE FROM forum_comment WHERE user_id=$1", req.ID)
+	// Hapus semua komentar di forum yang dibuat user
+	_, _ = config.DB.Exec(context.Background(), "DELETE FROM forum_comment WHERE forum_id IN (SELECT id FROM forum WHERE user_id=$1)", req.ID)
+	// Hapus semua forum yang dibuat user
+	_, _ = config.DB.Exec(context.Background(), "DELETE FROM forum WHERE user_id=$1", req.ID)
+	// Hapus semua laporan milik user
+	_, _ = config.DB.Exec(context.Background(), "DELETE FROM laporan WHERE user_id=$1", req.ID)
+	// Hapus semua data tantangan_user milik user
+	_, _ = config.DB.Exec(context.Background(), "DELETE FROM tantangan_user WHERE user_id=$1", req.ID)
+	// Hapus user
+	_, err := config.DB.Exec(context.Background(), "DELETE FROM users WHERE id=$1", req.ID)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Gagal menghapus user: "+err.Error()})
+		return
+	}
+	json.NewEncoder(w).Encode(map[string]string{"message": "User berhasil dihapus"})
 }
 
 func DeleteForum(w http.ResponseWriter, r *http.Request) {

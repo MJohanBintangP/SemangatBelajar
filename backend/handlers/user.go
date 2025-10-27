@@ -1,14 +1,49 @@
+
 package handlers
 
 import (
-	"backend/config"
-	"context"
-	"encoding/json"
-	"net/http"
-	"strings"
-
-	"github.com/dgrijalva/jwt-go"
+    "backend/config"
+    "context"
+    "encoding/json"
+    "net/http"
+    "strings"
+    "github.com/golang-jwt/jwt/v5"
 )
+
+// Handler untuk update user (username & role)
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	enableCORS(w)
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		ID       int    `json:"id"`
+		Username string `json:"username"`
+		Role     string `json:"role"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Request tidak valid", http.StatusBadRequest)
+		return
+	}
+	// Validasi role hanya boleh "admin" atau "user"
+	if req.Role != "admin" && req.Role != "user" {
+		http.Error(w, "Role tidak valid", http.StatusBadRequest)
+		return
+	}
+	// Update ke database
+	_, err := config.DB.Exec(context.Background(), "UPDATE users SET username=$1, role=$2 WHERE id=$3", req.Username, req.Role, req.ID)
+	if err != nil {
+		http.Error(w, "Gagal update user", http.StatusInternalServerError)
+		return
+	}
+		json.NewEncoder(w).Encode(map[string]string{"message": "User berhasil diupdate"})
+	}
+
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	enableCORS(w)
