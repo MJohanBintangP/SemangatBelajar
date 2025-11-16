@@ -1,5 +1,4 @@
-````markdown name=User_Manual_Ecosteps.md
-```markdown
+
 # User Manual — ECOSTEPS (Sistem Pelaporan Kerusakan Lingkungan)
 
 **Repo:** MJohanBintangP/SemangatBelajar (main)  
