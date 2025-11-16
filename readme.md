@@ -1,8 +1,5 @@
 User Manual — ECOSTEPS (Sistem Pelaporan Kerusakan Lingkungan)
-Repo: MJohanBintangP/SemangatBelajar (main)
-Tanggal: 2025-11-16
 
-Ringkasan singkat
 ECOSTEPS adalah platform pelaporan kerusakan lingkungan dan komunitas yang memungkinkan pengguna:
 - Melaporkan kerusakan lingkungan (dengan foto/video dan koordinat lokasi).
 - Melihat riwayat laporan dan status penanganannya.
