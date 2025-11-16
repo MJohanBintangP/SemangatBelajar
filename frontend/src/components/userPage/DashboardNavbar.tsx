@@ -41,21 +41,21 @@ export default function DashboardNavbar({ username, email }: { username?: string
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full justify-between">
       {/* Logo & Profil */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <img src={logoNavbar} alt="logoNavbar" className="mb-6" loading="lazy" />
         <div className="flex gap-6 items-center justify-start pl-7 mb-6">
           <img src={Profile} alt="Profile" className="w-12 rounded-full" loading="lazy" />
-          <div className="flex flex-col justify-center">
-            <div className="font-bold">{usernameState || '...'}</div>
-            <div className="text-xs text-[#9D9D9D]">{emailState || '...'}</div>
+          <div className="flex flex-col justify-center min-w-0">
+            <div className="font-bold truncate">{usernameState || '...'}</div>
+            <div className="text-xs text-[#9D9D9D] truncate">{emailState || '...'}</div>
           </div>
         </div>
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 flex flex-col gap-5 px-6 mb-4">
+      <nav className="flex-1 flex flex-col gap-5 px-6 mb-4 dashboard-nav">
         <Link to="/Dashboard" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Dashboard') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
           <Phospor.HouseSimpleIcon size={20} weight="bold" /> Dashboard
         </Link>
@@ -74,17 +74,17 @@ export default function DashboardNavbar({ username, email }: { username?: string
       </nav>
 
       {/* Report Box & Logout*/}
-      <div className="flex-shrink-0 px-6 mb-4">
+      <div className="shrink-0 px-6 mb-4">
         {/* Report Box */}
-        <div className="bg-[#008207] text-white h-[100px] rounded-[15px] mb-12">
-          <div className="flex gap-2 pl-6 items-center h-full">
-            <div>
+        <div className="bg-[#008207] text-white h-[100px] rounded-[15px] mb-12 relative overflow-hidden">
+          <div className="flex gap-2 pl-6 items-center h-full relative">
+            <div className="relative">
               <h3 className="max-w-[150px] font-medium text-xs mb-2">Buat laporanmu sekarang !</h3>
               <Link to="/Laporan">
                 <button className="cursor-pointer text-xs text-[#009B08] bg-white rounded-md px-5 py-1 font-medium">lapor</button>
               </Link>
             </div>
-            <img className="ml-auto bottom-26 absolute left-35" src={NotePencil} alt="NotePencil" loading="lazy" />
+            <img className="ml-auto absolute right-4 bottom-0 w-16 h-auto" src={NotePencil} alt="NotePencil" loading="lazy" />
           </div>
         </div>
 

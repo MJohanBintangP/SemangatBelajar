@@ -1,20 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-
-type User = {
-  username?: string;
-  email?: string;
-};
-
-type UserContextValue = {
-  user: User | null;
-  loading: boolean;
-  refresh: () => Promise<void>;
-};
-
-const UserContext = createContext<UserContextValue>({ user: null, loading: true, refresh: async () => {} });
+import React, { useEffect, useState } from 'react';
+import { UserContext, type User as UserType, type UserContextValue } from './userContextImpl';
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchProfile() {
@@ -34,7 +22,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         setUser({ username: data.username, email: data.email });
       }
-    } catch (err) {
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
@@ -45,9 +33,5 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     fetchProfile();
   }, []);
 
-  return <UserContext.Provider value={{ user, loading, refresh: fetchProfile }}>{children}</UserContext.Provider>;
-}
-
-export function useUser() {
-  return useContext(UserContext);
+  return <UserContext.Provider value={{ user, loading, refresh: fetchProfile } as UserContextValue}>{children}</UserContext.Provider>;
 }

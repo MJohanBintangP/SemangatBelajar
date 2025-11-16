@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import DashboardNavbar from '../../components/userPage/DashboardNavbar';
 import { Outlet } from 'react-router-dom';
-import { useUser } from '../../contexts/UserContext';
+import { useUser } from '../../contexts/userContextImpl';
 
 export default function LayoutDashboard() {
   const [showUnsupported, setShowUnsupported] = useState(false);
@@ -27,7 +27,7 @@ export default function LayoutDashboard() {
   return (
     <div className="bg-white min-h-screen flex overflow-hidden">
       {/* Sidebar for large screens */}
-      <aside className="hidden lg:flex w-64 bg-white h-screen flex-shrink-0 shadow-lg">
+      <aside className="hidden lg:flex w-64 bg-white min-h-screen shrink-0 shadow-lg">
         <div className="h-full flex flex-col overflow-hidden">
           <DashboardNavbar username={profile.username} email={profile.email} />
         </div>
@@ -49,7 +49,7 @@ export default function LayoutDashboard() {
                 <h2 className="font-semibold text-lg">Perangkat kecil terdeteksi</h2>
                 <p className="text-sm text-gray-700">Aplikasi ini dioptimalkan untuk tampilan desktop. Anda tetap bisa menggunakan fitur, namun beberapa tata letak mungkin tidak ideal di perangkat kecil.</p>
               </div>
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <button onClick={() => setShowUnsupported(false)} className="text-sm text-gray-600 hover:underline">Tutup</button>
               </div>
             </div>

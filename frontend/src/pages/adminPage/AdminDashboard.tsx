@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../../components/adminPage/AdminNavbar';
-import { useUser } from '../../contexts/UserContext';
+import { useUser } from '../../contexts/userContextImpl';
 
 type Laporan = {
   id: number;
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
   return (
     <div className="bg-white min-h-screen flex overflow-hidden">
       {/* Sidebar for large screens */}
-      <aside className="hidden lg:flex w-64 bg-white h-screen flex-shrink-0 shadow-lg">
+      <aside className="hidden lg:flex w-64 bg-white min-h-screen shrink-0 shadow-lg">
         <div className="h-full flex flex-col overflow-hidden">
           <AdminNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>

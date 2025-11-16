@@ -89,7 +89,7 @@ export default function Laporan() {
                     <div className="text-xs text-gray-600 mt-1">{laporan.deskripsi}</div>
                     <div className="text-xs text-gray-500 mt-2">Lokasi: {laporan.lokasi ?? '-'}</div>
                   </div>
-                  <div className="text-right ml-4 flex-shrink-0">
+                  <div className="text-right ml-4 shrink-0">
                     <div className="text-xs text-gray-500">No: {idx + 1}</div>
                     <div className="text-sm font-semibold mt-2">{laporan.status}</div>
                     <div className="text-xs text-gray-500 mt-1">{new Date(laporan.created_at).toLocaleString()}</div>

@@ -1,2 +1,200 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import 'tailwindcss';
+
+/* Accessibility helpers */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.skip-link {
+	position: absolute;
+	left: -999px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+.skip-link:focus,
+.skip-link:active {
+	left: 1rem;
+	top: 1rem;
+	width: auto;
+	height: auto;
+	padding: 0.5rem 1rem;
+	background: #111;
+	color: #fff;
+	z-index: 1000;
+}
+
+:focus {
+	outline: 3px solid Highlight;
+	outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+	outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* Accessibility feature classes applied to <body> */
+.a11y-reduce-motion * {
+	animation-duration: 0.001ms !important;
+	transition-duration: 0.001ms !important;
+}
+.a11y-large-text {
+	font-size: 112%;
+}
+.a11y-high-contrast {
+	/* Safe high-contrast mode: avoid forcing global color or filters which
+		 can break fixed positioning and make some text unreadable on colored
+		 backgrounds. Instead increase legibility via outlines, font-weight,
+		 and stronger focus indicators for interactive elements. */
+}
+.a11y-high-contrast :is(a, button, input, select, textarea) {
+	outline: 3px solid #000 !important;
+	outline-offset: 2px !important;
+	font-weight: 700 !important;
+}
+.a11y-high-contrast img {
+	/* make images more distinct on complex backgrounds */
+	image-rendering: auto;
+}
+.a11y-high-contrast .accessibility-panel,
+.a11y-high-contrast .accessibility-btn {
+	/* Keep the toolbar controls readable by forcing light background for the panel only */
+	background: #fff !important;
+	color: #000 !important;
+	border: 1px solid #000 !important;
+}
+
+/* Accessibility toolbar small UI */
+.accessibility-toolbar {
+	position: fixed;
+	right: 1rem;
+	bottom: 1rem;
+	z-index: 1100;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.5rem;
+}
+.accessibility-btn {
+	background: #ffffffcc;
+	border: 1px solid rgba(0,0,0,0.08);
+	color: #111;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+.accessibility-panel {
+	background: #fff;
+	border: 1px solid rgba(0,0,0,0.08);
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+	min-width: 180px;
+}
+@media (max-width: 640px) {
+	.accessibility-toolbar { right: 0.5rem; bottom: 0.5rem; }
+	.accessibility-panel { min-width: 160px; }
+}
+
+/* Prevent accidental horizontal overflow which can cut off sidebar content */
+body {
+	overflow-x: hidden;
+}
+
+/* Ensure accessibility toolbar and panel are always above other content */
+.accessibility-toolbar {
+	z-index: 9999;
+}
+.accessibility-panel {
+	z-index: 10000;
+}
+
+/* Exempt marquee from global reduce-motion overrides: restore animations/transitions */
+.marquee-ignore-reduce,
+.marquee-ignore-reduce * {
+	animation-duration: initial !important;
+	animation-iteration-count: initial !important;
+	transition-duration: initial !important;
+	scroll-behavior: auto !important;
+}
+
+/* CSS Marquee fallback styles */
+.css-marquee {
+	overflow: hidden;
+	width: 100%;
+}
+.css-marquee__track {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	will-change: transform;
+	animation: marquee var(--marquee-duration, 28s) linear infinite;
+}
+.css-marquee__track.paused {
+	animation-play-state: paused;
+}
+.css-marquee__item {
+	flex: 0 0 auto;
+}
+@keyframes marquee {
+	from { transform: translateX(0%); }
+	to { transform: translateX(-50%); }
+
+/* React Fast Marquee (rfm) - ensure it's not accidentally disabled by our global reduce-motion rules
+	 Behavior:
+	 - If the user/OS requests reduced motion (prefers-reduced-motion or body.a11y-reduce-motion), rfm animations stay paused.
+	 - Otherwise, allow rfm animations to run by restoring animation/transition properties for rfm classes.
+*/
+/* When user did NOT request reduced motion at OS level */
+@media (prefers-reduced-motion: no-preference) {
+	.rfm-marquee, .rfm-marquee *, .rfm-marquee-container, .rfm-marquee-container * {
+		animation-duration: initial !important;
+		animation-iteration-count: initial !important;
+		transition-duration: initial !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* If our accessibility toolbar set body.a11y-reduce-motion, ensure rfm honors that and pauses */
+.a11y-reduce-motion .rfm-marquee, .a11y-reduce-motion .rfm-marquee *,
+.a11y-reduce-motion .rfm-marquee-container, .a11y-reduce-motion .rfm-marquee-container * {
+	animation-duration: 0.001ms !important;
+	animation-iteration-count: 1 !important;
+	transition-duration: 0.001ms !important;
+}
+
+/* Also restore rfm animation when our computed playMarquee allows it (we already control via rendering/props)
+	 This CSS simply ensures rfm's built-in keyframe animation isn't removed by earlier global rules. */
+
+/* Hide dashboard nav scrollbar but keep scroll behavior (less intrusive) */
+.dashboard-nav {
+	overflow-y: auto; /* allow scrolling when content is long */
+	-ms-overflow-style: none; /* IE/Edge */
+	scrollbar-width: none; /* Firefox */
+}
+.dashboard-nav::-webkit-scrollbar {
+	display: none; /* Chrome/Safari/Webkit */
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.css-marquee__track { animation: none !important; }
+}

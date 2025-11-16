@@ -46,13 +46,13 @@ export default function AdminNavbar({ activeTab, setActiveTab, username, email }
   return (
     <div className="flex flex-col h-full">
       {/* Logo & Profil */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
   <img src={logoNavbar} alt="logoNavbar" className="mb-6" loading="lazy" />
         <div className="flex gap-6 items-center justify-start pl-7 mb-6">
           <img src={Profile} alt="Profile" className="w-12 rounded-full" loading="lazy" />
-          <div className="flex flex-col justify-center">
-            <div className="font-bold">{usernameState || '...'}</div>
-            <div className="text-xs text-[#9D9D9D]">{emailState || '...'}</div>
+          <div className="flex flex-col justify-center min-w-0">
+            <div className="font-bold truncate">{usernameState || '...'}</div>
+            <div className="text-xs text-[#9D9D9D] truncate">{emailState || '...'}</div>
             <div className="text-xs font-medium text-green-600">Administrator</div>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function AdminNavbar({ activeTab, setActiveTab, username, email }
       </nav>
 
       {/* Logout Button */}
-      <div className="flex-shrink-0 px-6 mb-4">
+      <div className="shrink-0 px-6 mb-4">
         <button onClick={handleLogout} className="cursor-pointer w-full bg-[#EE0000] text-white py-2 rounded-xl font-semibold hover:bg-red-700">
           LogOut
         </button>

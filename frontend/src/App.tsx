@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -11,12 +11,21 @@ import Forum from './pages/userPage/Forum';
 import Artikel from './pages/userPage/Artikel';
 
 import { UserProvider } from './contexts/UserContext';
+import AccessibilityMenu from './components/accessibility/AccessibilityMenu';
+
+function AccessibilityWrapper() {
+  const location = useLocation();
+  const excluded = ['/Login', '/Register'];
+  if (excluded.includes(location.pathname)) return null;
+  return <AccessibilityMenu />;
+}
 
 function App() {
   return (
-    <div className="font-[poppins]">
+    <div id="main-content" className="font-[poppins]">
       <UserProvider>
         <Router>
+          <AccessibilityWrapper />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/Login" element={<Login />} />

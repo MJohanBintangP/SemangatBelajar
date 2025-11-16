@@ -1,5 +1,6 @@
 import { CloverIcon } from '@phosphor-icons/react';
 import Marquee from 'react-fast-marquee';
+import { useEffect, useState } from 'react';
 
 import bg1 from '../../assets/1.svg';
 import bg2 from '../../assets/2.svg';
@@ -8,6 +9,67 @@ import bg4 from '../../assets/4.svg';
 import bg5 from '../../assets/5.svg';
 
 export default function FiturUtama() {
+  const [playMarquee, setPlayMarquee] = useState(true);
+
+  useEffect(() => {
+    const compute = () => {
+      try {
+        const raw = localStorage.getItem('a11yPrefs');
+        const prefs = raw ? JSON.parse(raw) : null;
+        const reduceMotionPref = !!(prefs && prefs.reduceMotion);
+        const osPref = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const bodyHas = typeof document !== 'undefined' && document.body.classList.contains('a11y-reduce-motion');
+        return !(reduceMotionPref || osPref || bodyHas);
+      } catch {
+        return true;
+      }
+    };
+
+    const value = compute();
+    // debug log removed; behavior determined by playMarquee value
+    setPlayMarquee(value);
+
+    // Listen for changes: storage (other tabs), matchMedia changes, and body class mutations
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'a11yPrefs') setPlayMarquee(compute());
+    };
+    window.addEventListener('storage', onStorage);
+
+    let mql: MediaQueryList | null = null;
+    let mm: (() => void) | null = null;
+    try {
+      if (window.matchMedia) {
+        mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+        mm = () => setPlayMarquee(compute());
+        if (mql.addEventListener) mql.addEventListener('change', mm);
+        else mql.addListener(mm);
+      }
+    } catch {
+      /* ignore */
+    }
+
+    const body = typeof document !== 'undefined' ? document.body : null;
+    let mo: MutationObserver | null = null;
+    if (body) {
+      mo = new MutationObserver(() => setPlayMarquee(compute()));
+      mo.observe(body, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      if (mql) {
+        try {
+          if (mm) {
+            if (mql.removeEventListener) mql.removeEventListener('change', mm);
+            else mql.removeListener(mm);
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+      if (mo) mo.disconnect();
+    };
+  }, []);
   const images = [bg1, bg2, bh3, bg4, bg5];
   const items = [...images, ...images];
 
@@ -28,7 +90,7 @@ export default function FiturUtama() {
         <div className="flex flex-col md:flex-row md:flex-wrap items-start md:justify-between gap-6 mb-10 px-4 md:px-0 min-w-0">
           <h1
             id="fitur-heading"
-            className="text-[#009B08] font-medium mb-4 md:mb-0 md:basis-2/3 min-w-0 break-words"
+            className="text-[#009B08] font-medium mb-4 md:mb-0 md:basis-2/3 min-w-0 wrap-break-word"
             style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', lineHeight: 1.05 }}
           >
             Mendorong Aksi Konservasi yang Efektif melalui Teknologi dan Analisis Data
@@ -50,14 +112,15 @@ export default function FiturUtama() {
           speed={12} // slower, elegant motion
           pauseOnHover={true}
           pauseOnClick={true}
-          play={true}
+          play={playMarquee}
+          key={String(playMarquee)}
           loop={0} // 0 = infinite
+          className="marquee-ignore-reduce z-0 flex items-center gap-2 sm:gap-4 md:gap-6 w-full"
           aria-label="galeri solusi - marquee"
           style={{ padding: '0.25rem 0' }}
-          className="z-0 flex items-center gap-2 sm:gap-4 md:gap-6 w-full"
         >
           {items.map((src, idx) => (
-            <figure key={`${idx}-${src}`} role="listitem" className="flex-shrink-0 rounded-2xl overflow-hidden mr-2 sm:mr-4 md:mr-6">
+            <figure key={`${idx}-${src}`} role="listitem" className="shrink-0 rounded-2xl overflow-hidden mr-2 sm:mr-4 md:mr-6">
               {/* responsive widths: small devices show smaller cards, larger screens bigger */}
         <img
           src={src}

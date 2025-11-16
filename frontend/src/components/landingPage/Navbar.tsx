@@ -79,42 +79,40 @@ export default function Navbar() {
 
       {/* Desktop Navbar */}
       {!isMobile && (
-        <div className="flex justify-center items-center w-full top-20">
-          <div className="flex fixed w-auto justify-center items-center p-4 bg-black/20 rounded-full backdrop-blur-[30.6px] shadow-lg">
-            <div className="flex justify-between items-center gap-20 pl-8">
-              <div className="flex items-center gap-10">
-                <img className="w-25" src={logo} alt="logo" loading="lazy" />
-                <ul>
-                  <li className="group inline-flex items-center gap-2 mr-6 cursor-pointer">
-                    <a onClick={() => scrollToSection('hero')} className="text-white font-medium transition-colors duration-150 group-hover:text-[#25E82F] cursor-pointer">
-                      Home
-                    </a>
-                  </li>
-                  <li className="inline-block mr-6">
-                    <a onClick={() => scrollToSection('pengenalan')} className="text-white font-medium hover:text-[#25E82F] transition-colors duration-150 cursor-pointer">
-                      Perkenalan
-                    </a>
-                  </li>
-                  <li className="inline-block mr-6">
-                    <a onClick={() => scrollToSection('video')} className="text-white font-medium hover:text-[#25E82F] transition-colors duration-150 cursor-pointer">
-                      Video
-                    </a>
-                  </li>
-                  <li className="inline-block mr-6">
-                    <a onClick={() => scrollToSection('fitur')} className="text-white font-medium hover:text-[#25E82F] transition-colors duration-150 cursor-pointer">
-                      Solusi
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <Link to="/Login" className="mr-4 hover:text-green-500 duration-200 transition-colors text-white border-2 px-6 py-2 rounded-full border-[#25E82F] font-medium">
-                  Masuk
-                </Link>
-                <Link to="/Register" className="bg-[#25E82F] hover:bg-green-600 duration-200 transition-colors text-md text-white px-8 py-2 rounded-full font-medium">
-                  Daftar
-                </Link>
-              </div>
+        <div className="fixed left-1/2 top-20 transform -translate-x-1/2 w-full">
+          <div className="mx-auto max-w-7xl flex justify-between items-center p-4 bg-black/20 rounded-full backdrop-blur-[30.6px] shadow-lg px-6">
+            <div className="flex items-center gap-6">
+              <img className="w-24" src={logo} alt="logo" loading="lazy" />
+              <ul className="hidden md:flex items-center gap-6">
+                <li className="group inline-flex items-center gap-2 cursor-pointer">
+                  <a onClick={() => scrollToSection('hero')} className="text-white font-medium transition-colors duration-150 group-hover:text-[#25E82F] cursor-pointer">
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a onClick={() => scrollToSection('pengenalan')} className="text-white font-medium hover:text-[#25E82F] transition-colors duration-150 cursor-pointer">
+                    Perkenalan
+                  </a>
+                </li>
+                <li>
+                  <a onClick={() => scrollToSection('video')} className="text-white font-medium hover:text-[#25E82F] transition-colors duration-150 cursor-pointer">
+                    Video
+                  </a>
+                </li>
+                <li>
+                  <a onClick={() => scrollToSection('fitur')} className="text-white font-medium hover:text-[#25E82F] transition-colors duration-150 cursor-pointer">
+                    Solusi
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link to="/Login" className="mr-4 hover:text-green-500 duration-200 transition-colors text-white border-2 px-4 py-2 rounded-full border-[#25E82F] font-medium">
+                Masuk
+              </Link>
+              <Link to="/Register" className="bg-[#25E82F] hover:bg-green-600 duration-200 transition-colors text-md text-white px-6 py-2 rounded-full font-medium">
+                Daftar
+              </Link>
             </div>
           </div>
         </div>

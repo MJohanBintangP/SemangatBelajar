@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useUser } from '../../contexts/UserContext';
+import { useUser } from '../../contexts/userContextImpl';
 import QuickActions from '../../components/userPage/QuickActions';
 import RiwayatLaporan from '../../components/userPage/RiwayatLaporan';
 import TantanganAktif from '../../components/userPage/TantanganAktif';
