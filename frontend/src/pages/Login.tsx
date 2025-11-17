@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 import ilustrasiLogin from '../assets/ilustrasilogin.svg';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,11 +19,22 @@ export default function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
+
+      // Some error responses may be empty or not valid JSON — handle gracefully
+      const txt = await res.text();
+      let data: any = {};
+      try {
+        data = txt ? JSON.parse(txt) : {};
+      } catch {
+        data = { message: txt || res.statusText };
+      }
+
       if (!res.ok) {
-        setError(data.message || 'Login gagal');
+        setError(data.message || `Login gagal (${res.status})`);
         return;
       }
+
+      // success
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', data.role);
       if (data.role === 'admin') {
