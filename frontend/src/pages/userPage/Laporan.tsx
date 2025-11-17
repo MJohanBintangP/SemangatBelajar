@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import BuatLaporan from '../../components/userPage/BuatLaporan';
 import ilustrasiEmpty from '../../assets/ilustrasiEmpty.svg';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type Laporan = {
   id: number;
@@ -24,7 +25,7 @@ export default function Laporan() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    fetch('http://localhost:8081/api/laporan/user', {
+    fetch(`${API_BASE_URL}/api/laporan/user`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -40,7 +41,7 @@ export default function Laporan() {
     const token = localStorage.getItem('token');
     if (!token) return;
     setLoading(true);
-    fetch('http://localhost:8081/api/laporan/user', {
+    fetch(`${API_BASE_URL}/api/laporan/user`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -84,9 +85,9 @@ export default function Laporan() {
             {riwayat.map((laporan, idx) => (
               <div key={laporan.id} className="bg-white rounded-lg shadow p-4 border">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="font-semibold">{laporan.judul}</div>
-                    <div className="text-xs text-gray-600 mt-1">{laporan.deskripsi}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate">{laporan.judul}</div>
+                    <div className="text-xs text-gray-600 mt-1 truncate">{laporan.deskripsi}</div>
                     <div className="text-xs text-gray-500 mt-2">Lokasi: {laporan.lokasi ?? '-'}</div>
                   </div>
                   <div className="text-right ml-4 shrink-0">
@@ -115,7 +116,7 @@ export default function Laporan() {
           {/* Desktop/table for large screens */}
           <div className="hidden lg:block overflow-x-auto rounded-2xl shadow">
             <table className="min-w-full bg-white rounded-2xl">
-            <thead>
+              <thead>
               <tr>
                 <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-2xl">No</th>
                 <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Judul</th>
@@ -152,7 +153,7 @@ export default function Laporan() {
             </tbody>
           </table>
         </div>
-        </>
+          </>
       )}
 
       {showPopup && (

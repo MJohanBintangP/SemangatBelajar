@@ -3,6 +3,8 @@ import { useState } from 'react';
 import ilustrasiRegister from '../assets/ilustrasilogin.svg';
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default function Register() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -14,17 +16,42 @@ export default function Register() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:8081/api/register', {
+      const res = await fetch(`${API_BASE_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
       });
+
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.message || 'Gagal daftar');
+        // Try to parse JSON error response first, fallback to plain text.
+        let errorMessage = 'Gagal daftar';
+        try {
+          const contentType = res.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const data = await res.json();
+            // If backend returns { message: '...' }
+            errorMessage = data?.message || (typeof data === 'string' ? data : JSON.stringify(data)) || errorMessage;
+          } else {
+            // Not JSON: read as text (e.g. "Password must be ...")
+            const text = await res.text();
+            errorMessage = text || errorMessage;
+          }
+        } catch {
+          // If parsing as json failed unexpectedly, try text as a last resort
+          try {
+            const text = await res.text();
+            errorMessage = text || errorMessage;
+          } catch {
+            // ignore - keep default
+          }
+        }
+        setError(errorMessage);
         return;
       }
-      navigate('/Login');
+
+      // ✅ Setelah registrasi sukses, arahkan ke verifikasi email
+      // Kirim email sebagai state ke halaman berikutnya
+      navigate('/verify-email', { state: { email } });
     } catch (err) {
       console.error(err);
       setError('Gagal koneksi ke server');
@@ -39,20 +66,20 @@ export default function Register() {
             <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
           </div>
           <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">Daftarkan akunmu di ECOSTEPS</h1>
-          <p className="text-[#878787] mb-12 text-sm max-w-[400px]">Masukkan username,email dan password untuk membuat akun-mu.</p>
+          <p className="text-[#878787] mb-12 text-sm max-w-[400px]">Masukkan username, email dan password untuk membuat akun-mu.</p>
           <form onSubmit={handleSubmit} className="w-80">
             {error && <div className="mb-4 text-red-600">{error}</div>}
             <div className="mb-4">
               <h3 className="font-medium">Username</h3>
-              <input type="text" placeholder="usernameExample" className="focus:outline-none w-full py-2 border-b-1 placeholder:text-[#D0D0D0]" value={username} onChange={(e) => setUsername(e.target.value)} required />
+              <input type="text" placeholder="usernameExample" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={username} onChange={(e) => setUsername(e.target.value)} required />
             </div>
             <div className="mb-4">
               <h3 className="font-medium">Email</h3>
-              <input type="email" placeholder="name@example.com" className="focus:outline-none w-full py-2 border-b-1 placeholder:text-[#D0D0D0]" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <input type="email" placeholder="name@example.com" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="mb-8">
               <h3 className="font-medium">Password</h3>
-              <input type="password" placeholder="passwordExample" className="focus:outline-none w-full py-2 border-b-1 placeholder:text-[#D0D0D0]" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <input type="password" placeholder="passwordExample" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
 
             <p className="text-sm text-[#454545] mb-8">
@@ -67,7 +94,7 @@ export default function Register() {
           </form>
         </div>
 
-  <img className="hidden lg:block relative -right-25" src={ilustrasiRegister} alt="ilustrasiRegister" loading="lazy" />
+        <img className="hidden lg:block relative -right-25" src={ilustrasiRegister} alt="ilustrasiRegister" />
       </div>
     </div>
   );

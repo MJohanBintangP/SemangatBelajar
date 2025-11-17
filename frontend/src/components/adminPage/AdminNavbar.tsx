@@ -13,16 +13,13 @@ type AdminNavbarProps = {
 
 export default function AdminNavbar({ activeTab, setActiveTab, username, email }: AdminNavbarProps) {
   const navigate = useNavigate();
-  // If parent passes username/email, use them; otherwise maintain internal state and fetch
   const [usernameState, setUsernameState] = useState(username || '');
   const [emailState, setEmailState] = useState(email || '');
 
-  // Fetch profile only if parent didn't provide username/email
   useEffect(() => {
-    if (username || email) return; // parent provided, skip fetch
+    if (username || email) return;
     const token = localStorage.getItem('token');
     if (!token) return;
-
     fetch('http://localhost:8081/api/user/profile', {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -47,7 +44,7 @@ export default function AdminNavbar({ activeTab, setActiveTab, username, email }
     <div className="flex flex-col h-full">
       {/* Logo & Profil */}
       <div className="shrink-0">
-  <img src={logoNavbar} alt="logoNavbar" className="mb-6" loading="lazy" />
+        <img src={logoNavbar} alt="logoNavbar" className="mb-6" loading="lazy" />
         <div className="flex gap-6 items-center justify-start pl-7 mb-6">
           <img src={Profile} alt="Profile" className="w-12 rounded-full" loading="lazy" />
           <div className="flex flex-col justify-center min-w-0">

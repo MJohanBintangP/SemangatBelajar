@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -15,4 +16,5 @@ func ConnectDB() {
 	if err != nil {
 		panic("failed to connect database: " + err.Error())
 	}
+	fmt.Println("Database connected")
 }

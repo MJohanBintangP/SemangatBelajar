@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import ilustrasiEmpty from '../../assets/ilustrasiEmpty.svg';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type ForumPost = {
   id: number;
@@ -34,7 +35,7 @@ export default function Forum() {
 
   function fetchForum() {
     setLoading(true);
-    fetch('http://localhost:8081/api/forum')
+    fetch(`${API_BASE_URL}/api/forum`)
       .then((res) => res.json())
       .then((data) => {
         setPosts(Array.isArray(data) ? data : []);
@@ -55,7 +56,7 @@ export default function Forum() {
       return;
     }
     try {
-      const res = await fetch('http://localhost:8081/api/forum', {
+      const res = await fetch(`${API_BASE_URL}/api/forum`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ judul, isi }),
@@ -76,7 +77,7 @@ export default function Forum() {
 
   async function handleComment(postId: number) {
     if (!commentIsi[postId] || !commentIsi[postId].trim()) return;
-    await fetch(`http://localhost:8081/api/forum/${postId}/comment`, {
+    await fetch(`${API_BASE_URL}/api/forum/${postId}/comment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -132,7 +133,7 @@ export default function Forum() {
           <div className="text-center py-10 text-gray-500">Memuat data...</div>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-lg py-16">
-            <img src={ilustrasiEmpty} alt="Forum kosong" loading="lazy" className="w-80 mb-6" />
+            <img src={ilustrasiEmpty} alt="Forum kosong" className="w-80 mb-6" />
             <div className="text-2xl font-bold mb-2">Forum kosong</div>
             <div className="text-gray-500 text-lg text-center">Buat forum pertamamu terlebih dahulu!</div>
           </div>

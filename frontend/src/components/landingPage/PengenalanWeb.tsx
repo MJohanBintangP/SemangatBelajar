@@ -24,7 +24,7 @@ export default function PengenalanWeb() {
             Coba sekarang
           </button>
         </div>
-  <img className="w-[400px]" src={ilustrasi1} alt="ilustrasi1" loading="lazy" />
+        <img className="w-[400px]" src={ilustrasi1} alt="ilustrasi1" />
       </div>
     </section>
   );

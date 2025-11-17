@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../../components/adminPage/AdminNavbar';
-import { useUser } from '../../contexts/userContextImpl';
 
 type Laporan = {
   id: number;
@@ -37,15 +36,50 @@ export default function AdminDashboard() {
   const [pesan, setPesan] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('laporan');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [profile, setProfile] = useState<{ username?: string; email?: string }>({});
+  const [role, setRole] = useState<string>('');
+  const [editUserId, setEditUserId] = useState<number | null>(null);
+  const [editUsername, setEditUsername] = useState('');
+  const [editRole, setEditRole] = useState('user');
   const navigate = useNavigate();
-  const hamburgerRef = useRef<HTMLButtonElement | null>(null);
-  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
-  const drawerRef = useRef<HTMLDivElement | null>(null);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  // Robust response parser: try res.json(), fallback to text when JSON parsing fails
+  async function parseResponse(res: Response): Promise<unknown> {
+    try {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        try {
+          return await res.json();
+        } catch {
+          // If res.json() fails (malformed JSON), try reading text and parsing manually
+          const txt = await res.text();
+          try {
+            return JSON.parse(txt);
+          } catch {
+            return txt;
+          }
+        }
+      }
+      // Not JSON according to header -> try text, and attempt JSON.parse anyway
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        return text;
+      }
+    } catch {
+      try {
+        return await res.text();
+      } catch {
+        return null;
+      }
+    }
+  }
 
   useEffect(() => {
     fetchAllData();
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole || '');
     // eslint-disable-next-line
   }, []);
 
@@ -57,93 +91,42 @@ export default function AdminDashboard() {
       navigate('/login');
       return;
     }
-
     try {
-      const resLaporan = await fetch('http://localhost:8081/api/laporan/all', {
+      const resLaporan = await fetch(`${API_BASE_URL}/api/laporan/all`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
-
       if (resLaporan.status === 401) {
         navigate('/login');
         return;
       }
-
-      const dataLaporan = await resLaporan.json();
+      const dataLaporan = await parseResponse(resLaporan);
       setLaporan(Array.isArray(dataLaporan) ? dataLaporan : []);
 
-      const resUser = await fetch(`http://localhost:8081/api/user/all?t=${Date.now()}`, {
+      const resUser = await fetch(`${API_BASE_URL}/api/user/all?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
-
-      const dataUser = await resUser.json();
+      const dataUser = await parseResponse(resUser);
       setUsers(Array.isArray(dataUser) ? dataUser : []);
 
-      const resForum = await fetch(`http://localhost:8081/api/forum?t=${Date.now()}`, {
+      const resForum = await fetch(`${API_BASE_URL}/api/forum?t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
-
-      const dataForum = await resForum.json();
+      const dataForum = await parseResponse(resForum);
       setForums(Array.isArray(dataForum) ? dataForum : []);
     } catch (err) {
       console.error('Error fetching data:', err);
       setPesan('Gagal mengambil data dari server');
     }
-
     setLoading(false);
   }
-
-  const { user: ctxUser } = useUser();
-
-  useEffect(() => {
-    if (ctxUser) setProfile({ username: ctxUser.username, email: ctxUser.email });
-  }, [ctxUser]);
-
-  // Accessibility: trap focus inside drawer and close on Escape
-  useEffect(() => {
-    if (!sidebarOpen) return;
-
-    // focus close button when drawer opens
-    setTimeout(() => {
-      closeBtnRef.current?.focus();
-    }, 0);
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setSidebarOpen(false);
-        hamburgerRef.current?.focus();
-      }
-
-      if (e.key === 'Tab' && drawerRef.current) {
-        const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusable.length === 0) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [sidebarOpen]);
 
   async function updateStatus(id: number, status: string) {
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:8081/api/laporan/update', {
+    const res = await fetch(`${API_BASE_URL}/api/laporan/update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -151,9 +134,10 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id, status }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal update status');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal update status';
+      setPesan(msg);
       return;
     }
     setPesan('Status berhasil diupdate');
@@ -164,7 +148,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Yakin ingin menghapus laporan ini?')) return;
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:8081/api/laporan/delete', {
+    const res = await fetch(`${API_BASE_URL}/api/laporan/delete`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -172,9 +156,10 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal menghapus laporan');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus laporan';
+      setPesan(msg);
       return;
     }
     setPesan('Laporan berhasil dihapus');
@@ -185,7 +170,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Yakin ingin menghapus forum ini?')) return;
     setPesan('');
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:8081/api/forum/delete', {
+    const res = await fetch(`${API_BASE_URL}/api/forum/delete`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -193,12 +178,70 @@ export default function AdminDashboard() {
       },
       body: JSON.stringify({ id }),
     });
-    const data = await res.json();
+    const data = await parseResponse(res);
     if (!res.ok) {
-      setPesan(data.message || 'Gagal menghapus forum');
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus forum';
+      setPesan(msg);
       return;
     }
     setPesan('Forum berhasil dihapus');
+    fetchAllData();
+  }
+
+  async function handleEditUser(u: User) {
+    setEditUserId(u.id);
+    setEditUsername(u.username);
+    setEditRole(u.role);
+  }
+
+  function handleCancelEdit() {
+    setEditUserId(null);
+    setEditUsername('');
+    setEditRole('user');
+  }
+
+  async function handleDeleteUser(id: number) {
+    if (!window.confirm('Yakin ingin menghapus pengguna ini ?')) return;
+    setPesan('');
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/api/user/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id }),
+    });
+    const data = await parseResponse(res);
+    if (!res.ok) {
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus user';
+      setPesan(msg);
+      return;
+    }
+    setPesan('User berhasil dihapus');
+    setEditUserId(null);
+    fetchAllData();
+  }
+
+  async function handleSaveEditUser(id: number) {
+    setPesan('');
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/api/user/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id, username: editUsername, role: editRole }),
+    });
+    const data = await parseResponse(res);
+    if (!res.ok) {
+      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal update user';
+      setPesan(msg);
+      return;
+    }
+    setPesan('User berhasil diupdate');
+    setEditUserId(null);
     fetchAllData();
   }
 
@@ -210,42 +253,10 @@ export default function AdminDashboard() {
           <AdminNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </aside>
-
-  <main aria-hidden={sidebarOpen} className="flex-1 overflow-y-auto px-4 md:px-8 lg:px-10 py-5">
-        {/* Top compact header for small screens with hamburger */}
-        <div className="lg:hidden mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button ref={hamburgerRef} aria-label="Open menu" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(true)} className="p-2 rounded-md bg-gray-100">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <div className="font-semibold text-lg">Dashboard Admin</div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="text-sm text-gray-700">{profile.username || '...'}</div>
-          </div>
-        </div>
-
-        {/* Mobile drawer overlay */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 z-50">
-              <div className="absolute inset-0 bg-black opacity-40" onClick={() => setSidebarOpen(false)} />
-              <div ref={drawerRef} role="dialog" aria-modal="true" aria-label="Sidebar menu" className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-lg p-4 overflow-auto">
-                <div className="flex justify-end mb-4">
-                  <button ref={closeBtnRef} onClick={() => setSidebarOpen(false)} aria-label="Close menu" className="p-1">
-                    ×
-                  </button>
-                </div>
-                <AdminNavbar activeTab={activeTab} setActiveTab={(t) => { setActiveTab(t); setSidebarOpen(false); }} username={profile.username} email={profile.email} />
-              </div>
-          </div>
-        )}
+      <main className="flex-1 overflow-y-auto px-10 py-5">
         <div className="py-10">
           <h2 className="text-2xl font-bold mb-4">Dashboard Admin</h2>
-
           {pesan && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">{pesan}</div>}
-
           {loading ? (
             <div className="text-center text-gray-500 py-8">Memuat data...</div>
           ) : (
@@ -254,8 +265,7 @@ export default function AdminDashboard() {
               {activeTab === 'laporan' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Daftar Laporan</h3>
-                  {/* Table for large screens */}
-                  <div className="hidden lg:block overflow-x-auto rounded-lg shadow">
+                  <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
                         <tr>
@@ -329,64 +339,6 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
-
-                  {/* Cards for small/mobile screens */}
-                  <div className="block lg:hidden space-y-4">
-                    {laporan.length === 0 ? (
-                      <div className="text-center text-gray-500 py-4">Belum ada laporan.</div>
-                    ) : (
-                      laporan.map((l) => (
-                        <div key={l.id} className="bg-white rounded-lg shadow p-4 border">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <div className="text-sm font-semibold">{l.judul}</div>
-                              <div className="text-xs text-gray-600">{l.deskripsi.substring(0, 100)}...</div>
-                              <div className="text-xs text-gray-500 mt-2">Lokasi: {l.lokasi}</div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xs text-gray-500">ID: {l.id}</div>
-                              <div className="mt-2">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${l.status === 'Selesai' ? 'bg-green-100 text-green-800' : l.status === 'Diproses' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{l.status}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {l.foto_url && (
-                              <a href={l.foto_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600">
-                                Lihat Foto
-                              </a>
-                            )}
-                            {l.video_url && (
-                              <a href={l.video_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600">
-                                Lihat Video
-                              </a>
-                            )}
-                          </div>
-
-                          <div className="mt-3 flex gap-2">
-                            <button
-                              className={`bg-yellow-500 text-white px-3 py-1 rounded text-sm ${l.status === 'Diproses' || l.status === 'Selesai' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-yellow-600'}`}
-                              onClick={() => updateStatus(l.id, 'Diproses')}
-                              disabled={l.status === 'Diproses' || l.status === 'Selesai'}
-                            >
-                              Proses
-                            </button>
-                            <button
-                              className={`bg-green-600 text-white px-3 py-1 rounded text-sm ${l.status === 'Selesai' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-green-700'}`}
-                              onClick={() => updateStatus(l.id, 'Selesai')}
-                              disabled={l.status === 'Selesai'}
-                            >
-                              Selesai
-                            </button>
-                            <button className="bg-red-600 text-white px-3 py-1 rounded text-sm cursor-pointer hover:bg-red-700" onClick={() => deleteLaporan(l.id)}>
-                              Hapus
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
                 </div>
               )}
 
@@ -394,7 +346,7 @@ export default function AdminDashboard() {
               {activeTab === 'users' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Daftar User</h3>
-                  <div className="hidden lg:block overflow-x-auto rounded-lg shadow">
+                  <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
                         <tr>
@@ -402,7 +354,8 @@ export default function AdminDashboard() {
                           <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Email</th>
                           <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Username</th>
                           <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Role</th>
-                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tr-lg">Poin</th>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Poin</th>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tr-lg">Aksi</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -417,40 +370,42 @@ export default function AdminDashboard() {
                             <tr key={u.id} className="border-t hover:bg-gray-50">
                               <td className="px-4 py-3">{u.id}</td>
                               <td className="px-4 py-3">{u.email}</td>
-                              <td className="px-4 py-3">{u.username}</td>
+                              <td className="px-4 py-3">{editUserId === u.id ? <input type="text" className="border rounded px-2 py-1 text-sm" value={editUsername} onChange={(e) => setEditUsername(e.target.value)} /> : u.username}</td>
                               <td className="px-4 py-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>{u.role}</span>
+                                {editUserId === u.id ? (
+                                  <select className="border rounded px-2 py-1 text-sm" value={editRole} onChange={(e) => setEditRole(e.target.value)}>
+                                    <option value="user">user</option>
+                                    <option value="admin">admin</option>
+                                  </select>
+                                ) : (
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>{u.role}</span>
+                                )}
                               </td>
                               <td className="px-4 py-3">{u.poin}</td>
+                              <td className="px-4 py-3">
+                                {editUserId === u.id ? (
+                                  <div className="flex gap-2">
+                                    <button className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" onClick={() => handleSaveEditUser(u.id)}>
+                                      Simpan
+                                    </button>
+                                    <button className="bg-gray-400 text-white px-2 py-1 rounded text-xs hover:bg-gray-500" onClick={handleCancelEdit}>
+                                      Batal
+                                    </button>
+                                    <button className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" onClick={() => handleDeleteUser(u.id)}>
+                                      Hapus
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button className="bg-yellow-500 text-white px-2 py-1 rounded text-xs hover:bg-yellow-600" onClick={() => handleEditUser(u)}>
+                                    Edit
+                                  </button>
+                                )}
+                              </td>
                             </tr>
                           ))
                         )}
                       </tbody>
                     </table>
-                  </div>
-
-                  <div className="block lg:hidden space-y-4">
-                    {users.length === 0 ? (
-                      <div className="text-center text-gray-500 py-4">Belum ada user.</div>
-                    ) : (
-                      users.map((u) => (
-                        <div key={u.id} className="bg-white rounded-lg shadow p-4 border">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="text-sm font-semibold">{u.username}</div>
-                              <div className="text-xs text-gray-600">{u.email}</div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xs text-gray-500">ID: {u.id}</div>
-                              <div className="mt-2">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>{u.role}</span>
-                              </div>
-                              <div className="text-sm mt-2">Poin: {u.poin}</div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
                   </div>
                 </div>
               )}
@@ -459,7 +414,7 @@ export default function AdminDashboard() {
               {activeTab === 'forums' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Daftar Forum</h3>
-                  <div className="hidden lg:block overflow-x-auto rounded-lg shadow">
+                  <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
                         <tr>
@@ -485,42 +440,17 @@ export default function AdminDashboard() {
                               <td className="px-4 py-3">{f.user}</td>
                               <td className="px-4 py-3">{new Date(f.created_at).toLocaleDateString()}</td>
                               <td className="px-4 py-3">
-                                <button className="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer" onClick={() => deleteForum(f.id)}>
-                                  Hapus
-                                </button>
+                                {role === 'admin' && (
+                                  <button className="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer" onClick={() => deleteForum(f.id)}>
+                                    Hapus
+                                  </button>
+                                )}
                               </td>
                             </tr>
                           ))
                         )}
                       </tbody>
                     </table>
-                  </div>
-
-                  <div className="block lg:hidden space-y-4">
-                    {forums.length === 0 ? (
-                      <div className="text-center text-gray-500 py-4">Belum ada forum.</div>
-                    ) : (
-                      forums.map((f) => (
-                        <div key={f.id} className="bg-white rounded-lg shadow p-4 border">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <div className="text-sm font-semibold">{f.judul}</div>
-                              <div className="text-xs text-gray-600">oleh {f.user}</div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xs text-gray-500">ID: {f.id}</div>
-                              <div className="text-xs mt-1">{new Date(f.created_at).toLocaleDateString()}</div>
-                            </div>
-                          </div>
-
-                          <div className="mt-3">
-                            <button className="bg-red-600 text-white px-3 py-1 rounded text-sm cursor-pointer" onClick={() => deleteForum(f.id)}>
-                              Hapus
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
                   </div>
                 </div>
               )}

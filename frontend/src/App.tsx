@@ -8,7 +8,9 @@ import Laporan from './pages/userPage/Laporan';
 import AdminDashboard from './pages/adminPage/AdminDashboard';
 import Tantangan from './pages/userPage/Tantangan';
 import Forum from './pages/userPage/Forum';
+import ResetPassword from './pages/ResetPassword';
 import Artikel from './pages/userPage/Artikel';
+import VerifyEmail from './pages/VerifyEmail';
 
 import { UserProvider } from './contexts/UserContext';
 import AccessibilityMenu from './components/accessibility/AccessibilityMenu';
@@ -29,6 +31,8 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/Login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/Register" element={<Register />} />
             <Route path="/AdminDashboard" element={<AdminDashboard />} />
             <Route path="/" element={<LayoutDashboard />}>

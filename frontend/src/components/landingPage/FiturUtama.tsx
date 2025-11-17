@@ -26,10 +26,8 @@ export default function FiturUtama() {
     };
 
     const value = compute();
-    // debug log removed; behavior determined by playMarquee value
     setPlayMarquee(value);
 
-    // Listen for changes: storage (other tabs), matchMedia changes, and body class mutations
     const onStorage = (e: StorageEvent) => {
       if (e.key === 'a11yPrefs') setPlayMarquee(compute());
     };
@@ -70,18 +68,15 @@ export default function FiturUtama() {
       if (mo) mo.disconnect();
     };
   }, []);
+
   const images = [bg1, bg2, bh3, bg4, bg5];
   const items = [...images, ...images];
 
   return (
-  <section
-      id="fitur"
-      className="mt-20 bg-white py-10 overflow-hidden relative"
-      style={{ left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw', width: '100vw' }}
-    >
+    <section id="fitur" className="mt-20 bg-white px-4 md:px-20 lg:px-32 py-10 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Badge Solusi Kami */}
-        <div className="flex gap-2 items-center bg-black rounded-full px-6 py-1 mb-4 text-white w-fit">
+        <div className="relative left-5 lg:left-40 flex gap-2 items-center bg-black rounded-full px-6 py-1 mb-4 text-white w-fit">
           <CloverIcon className="overflow-clip rotate-12" size={30} weight="bold" />
           <h3 className="font-semibold">Solusi Kami</h3>
         </div>
@@ -102,41 +97,36 @@ export default function FiturUtama() {
             Perubahan besar tidak bisa dilakukan sendiri. Ecosteps menjembatani laporan masyarakat dengan puluhan lembaga pemerintah dan organisasi masyarakat sipil di bidang lingkungan.
           </p>
         </div>
-      </div>
 
-      {/* Full-bleed marquee is placed outside the max-width container so it truly spans the viewport */}
-  <div className="overflow-hidden relative w-full" aria-labelledby="fitur-heading" role="region">
-        {/* Continuous, slow, seamless marquee - accessible and responsive */}
-        <Marquee
-          gradient={false}
-          speed={12} // slower, elegant motion
-          pauseOnHover={true}
-          pauseOnClick={true}
-          play={playMarquee}
-          key={String(playMarquee)}
-          loop={0} // 0 = infinite
-          className="marquee-ignore-reduce z-0 flex items-center gap-2 sm:gap-4 md:gap-6 w-full"
-          aria-label="galeri solusi - marquee"
-          style={{ padding: '0.25rem 0' }}
-        >
-          {items.map((src, idx) => (
-            <figure key={`${idx}-${src}`} role="listitem" className="shrink-0 rounded-2xl overflow-hidden mr-2 sm:mr-4 md:mr-6">
-              {/* responsive widths: small devices show smaller cards, larger screens bigger */}
-        <img
-          src={src}
-          alt={`Solusi ${(idx % images.length) + 1}`}
-          loading="lazy"
-          draggable={false}
-          className="block h-44 md:h-56 lg:h-72 object-cover rounded-2xl"
-          style={{ width: 'clamp(120px, 20vw, 320px)' }}
-        />
-            </figure>
-          ))}
-        </Marquee>
-
-        {/* edge masks: visually create a small inset from the viewport edges without adding padding inside the marquee
-            they overlay the left/right edges and do not interfere with marquee interaction (pointer-events-none) */}
-        {/* removed left/right masks to allow both edges to be flush; keep only if you want a visual inset */}
+        {/* Full-bleed marquee is placed outside the max-width container so it truly spans the viewport */}
+        <div className="overflow-hidden relative w-full" aria-labelledby="fitur-heading" role="region">
+          {/* Continuous, slow, seamless marquee - accessible and responsive */}
+          <Marquee
+            gradient={false}
+            speed={12}
+            pauseOnHover={true}
+            pauseOnClick={true}
+            play={playMarquee}
+            key={String(playMarquee)}
+            loop={0}
+            className="marquee-ignore-reduce z-0 flex items-center gap-2 sm:gap-4 md:gap-6 w-full"
+            aria-label="galeri solusi - marquee"
+            style={{ padding: '0.25rem 0' }}
+          >
+            {items.map((src, idx) => (
+              <figure key={`${idx}-${src}`} role="listitem" className="shrink-0 rounded-2xl overflow-hidden mr-2 sm:mr-4 md:mr-6">
+                <img
+                  src={src}
+                  alt={`Solusi ${(idx % images.length) + 1}`}
+                  loading="lazy"
+                  draggable={false}
+                  className="block h-44 md:h-56 lg:h-72 object-cover rounded-2xl"
+                  style={{ width: 'clamp(120px, 20vw, 320px)' }}
+                />
+              </figure>
+            ))}
+          </Marquee>
+        </div>
       </div>
     </section>
   );

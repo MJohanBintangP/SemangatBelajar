@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useUser } from '../../contexts/userContextImpl';
 import QuickActions from '../../components/userPage/QuickActions';
 import RiwayatLaporan from '../../components/userPage/RiwayatLaporan';
 import TantanganAktif from '../../components/userPage/TantanganAktif';
 import ArtikelGrid from './Artikel';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dashboard() {
   const [username, setUsername] = useState('');
-  const { user: ctxUser } = useUser();
   const [tantanganSelesai, setTantanganSelesai] = useState(0);
   const [totalPoin, setTotalPoin] = useState(0);
   const [totalLaporan, setTotalLaporan] = useState(0);
@@ -15,36 +14,30 @@ export default function Dashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (ctxUser) {
-      setUsername(ctxUser.username || '');
-    }
-
     if (!token) return;
 
-    if (!ctxUser) {
-      fetch('http://localhost:8081/api/user/profile', {
-        headers: { Authorization: `Bearer ${token}` },
+    fetch(`${API_BASE_URL}/api/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUsername(data.username || '');
       })
-        .then((res) => res.json())
-        .then((data) => {
-          setUsername(data.username || '');
-        })
-        .catch(() => setUsername(''));
-    }
+      .catch(() => setUsername(''));
 
-    fetch('http://localhost:8081/api/tantangan/selesai-hari-ini', {
+    fetch(`${API_BASE_URL}/api/tantangan/selesai-hari-ini`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTantanganSelesai(Array.isArray(data) ? data.length : 0));
 
-    fetch('http://localhost:8081/api/user/poin', {
+    fetch(`${API_BASE_URL}/api/user/poin`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setTotalPoin(data.poin || 0));
 
-    fetch('http://localhost:8081/api/laporan/user', {
+    fetch(`${API_BASE_URL}/api/laporan/user`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -54,7 +47,7 @@ export default function Dashboard() {
           setStatusTerbaru(data.length > 0 ? data[0].status : '-');
         }
       });
-  }, [ctxUser]);
+  }, []);
 
   return (
     <div className="flex flex-col py-10">
