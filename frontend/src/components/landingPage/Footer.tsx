@@ -3,7 +3,7 @@ import bg from '../../assets/bg.svg';
 
 export default function Footer() {
   return (
-    <footer className="relative w-full h-[200px] overflow-hidden mt-40">
+    <footer className="relative w-full h-auto md:h-[200px] overflow-hidden mt-40">
       {/* Background image */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-white to-transparent z-10"></div>
@@ -11,8 +11,8 @@ export default function Footer() {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col justify-center items-center h-full">
-        <img src={logo} alt="ECOSTEPS logo" className="w-40 mb-2" />
+      <div className="relative z-20 flex flex-col justify-center items-center py-8 md:h-full">
+        <img src={logo} alt="ECOSTEPS logo" className="w-40 mb-2 max-w-full" />
         <p className="text-white text-sm">© 2025 ECOSTEPS.Team.io</p>
       </div>
     </footer>

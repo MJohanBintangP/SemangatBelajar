@@ -41,7 +41,7 @@ export default function DashboardNavbar() {
     <div className="flex flex-col h-full justify-between">
       {/* Logo & Profile */}
       <div className="shrink-0">
-        <img src={logoNavbar} alt="logoNavbar" className="mb-6" loading="lazy" />
+        <img src={logoNavbar} alt="logoNavbar" className="mb-6 w-full full-bleed" loading="lazy" />
         <div className="flex gap-6 items-center justify-start pl-7 mb-6">
           <img src={Profile} alt="Profile" className="w-12 rounded-full" loading="lazy" />
           <div className="flex flex-col justify-center min-w-0">
@@ -52,7 +52,7 @@ export default function DashboardNavbar() {
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 flex flex-col gap-5 px-6 mb-4 dashboard-nav">
+      <nav className="flex-1 flex flex-col gap-5 px-3 sm:px-6 mb-4 dashboard-nav">
         <Link to="/Dashboard" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Dashboard') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
           <Phospor.HouseSimpleIcon size={20} weight="bold" /> Dashboard
         </Link>
@@ -71,12 +71,12 @@ export default function DashboardNavbar() {
       </nav>
 
       {/* Report Box & Logout*/}
-      <div className="shrink-0 px-6 mb-4">
+      <div className="shrink-0 px-3 sm:px-6 mb-4">
         {/* Report Box */}
-        <div className="bg-[#008207] text-white h-[100px] rounded-[15px] mb-12 relative overflow-hidden">
+        <div className="bg-[#008207] text-white h-auto sm:h-[100px] rounded-[15px] mb-12 relative overflow-hidden">
           <div className="flex gap-2 pl-6 items-center h-full relative">
-            <div className="relative">
-              <h3 className="max-w-[150px] font-medium text-xs mb-2">Buat laporanmu sekarang !</h3>
+              <div className="relative">
+              <h3 className="max-w-full sm:max-w-[150px] font-medium text-xs mb-2">Buat laporanmu sekarang !</h3>
               <Link to="/Laporan">
                 <button className="cursor-pointer text-xs text-[#009B08] bg-white rounded-md px-5 py-1 font-medium">lapor</button>
               </Link>

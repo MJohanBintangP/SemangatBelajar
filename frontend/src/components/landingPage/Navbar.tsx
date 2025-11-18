@@ -34,7 +34,7 @@ export default function Navbar() {
       {/* Mobile/Tablet Header */}
       {isMobile && (
         <div className="flex justify-between items-center px-6 py-4 bg-black/90 backdrop-blur-md">
-          <img className="w-20" src={logo} alt="logo" />
+          <img className="w-20 max-w-full" src={logo} alt="logo" />
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white p-2">
             {isMenuOpen ? <XIcon size={24} weight="bold" /> : <ListIcon size={24} weight="bold" />}
           </button>

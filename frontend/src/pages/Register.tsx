@@ -65,9 +65,9 @@ export default function Register() {
           <div onClick={() => navigate('/')} className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer">
             <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
           </div>
-          <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">Daftarkan akunmu di ECOSTEPS</h1>
-          <p className="text-[#878787] mb-12 text-sm max-w-[400px]">Masukkan username, email dan password untuk membuat akun-mu.</p>
-          <form onSubmit={handleSubmit} className="w-80">
+          <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-full sm:max-w-[400px]">Daftarkan akunmu di ECOSTEPS</h1>
+          <p className="text-[#878787] mb-12 text-sm max-w-full sm:max-w-[400px]">Masukkan username, email dan password untuk membuat akun-mu.</p>
+          <form onSubmit={handleSubmit} className="w-80 max-w-full">
             {error && <div className="mb-4 text-red-600">{error}</div>}
             <div className="mb-4">
               <h3 className="font-medium">Username</h3>
@@ -88,7 +88,7 @@ export default function Register() {
                 Masuk
               </span>
             </p>
-            <button type="submit" className="cursor-pointer hover:bg-green-700 duration-200 transition-colors w-fit bg-[#25E82F] text-white px-8 py-2 rounded-full font-semibold">
+            <button type="submit" className="cursor-pointer hover:bg-green-700 duration-200 transition-colors w-fit bg-[#25E82F] text-white px-4 sm:px-8 py-2 rounded-full font-semibold">
               Daftar
             </button>
           </form>

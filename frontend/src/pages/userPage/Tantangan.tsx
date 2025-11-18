@@ -118,7 +118,7 @@ export default function Tantangan() {
             <img
               src={ilustrasiRank}
               alt="Leaderboard"
-              className="w-80 object-contain"
+              className="w-80 max-w-full object-contain"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}

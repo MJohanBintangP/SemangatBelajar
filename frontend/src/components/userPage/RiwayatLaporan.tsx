@@ -35,7 +35,7 @@ export default function RiwayatLaporan() {
 
   return (
     <div className="my-4">
-      <div className="bg-white px-10 py-6 rounded-[15px] shadow-md">
+      <div className="bg-white px-4 sm:px-10 py-6 rounded-[15px] shadow-md">
         <h3 className="font-bold ">📌 Riwayat Laporan</h3>
         <ul className="max-h-45 overflow-y-auto text-sm">
           {loading ? (

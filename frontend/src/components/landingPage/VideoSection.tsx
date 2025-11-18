@@ -68,7 +68,7 @@ export default function VideoSection() {
 
   return (
     <section id="video" className="bg-[#0F1F12] w-full mt-20 pb-16">
-      <div className="h-[900px] flex flex-col items-center ">
+      <div className="h-auto md:h-[900px] flex flex-col items-center ">
         {/* Video */}
         <div className="w-full relative aspect-video rounded-lg overflow-hidden mb-20">
           {!playing ? (
@@ -88,7 +88,7 @@ export default function VideoSection() {
           )}
         </div>
         {/* Judul & deskripsi */}
-        <div className="text-center max-w-3xl mx-auto flex flex-col items-center justify-center px-10">
+        <div className="text-center max-w-3xl mx-auto flex flex-col items-center justify-center px-4 sm:px-10">
           <h1 className="font-medium text-2xl md:text-4xl text-white mb-6">Bagaimana ECOSTEPS Bekerja?</h1>
           <p className="text-[#A1A1A1] mb-15 text-base md:text-lg">Setiap laporan yang masuk akan melalui proses terstruktur untuk memastikan validitas dan penanganan yang efektif oleh pihak yang berwenang.</p>
         </div>

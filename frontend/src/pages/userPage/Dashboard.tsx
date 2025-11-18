@@ -55,7 +55,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="rounded-xl mb-8">
           <div className="text-2xl font-bold mb-4">Halo, {username ? username : '...'} 👋</div>
-          <div className="bg-[#25E82F]/9 w-fit px-12 py-3 rounded-lg flex justify-center flex-wrap gap-6 text-base">
+          <div className="bg-[#25E82F]/9 w-fit px-4 sm:px-12 py-3 rounded-lg flex justify-center flex-wrap gap-4 sm:gap-6 text-sm sm:text-base">
             <div>
               Tantangan Diselesaikan Hari Ini: <span className="font-bold">{tantanganSelesai}</span>
             </div>

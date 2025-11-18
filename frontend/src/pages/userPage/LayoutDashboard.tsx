@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import DashboardNavbar from '../../components/userPage/DashboardNavbar';
 import { Outlet, useNavigate } from 'react-router-dom';
-import ilustrasiLayout from '../../assets/ilustrasiLayout.svg';
 
 export default function LayoutDashboard() {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    navigate('/');
+  }
 
   useEffect(() => {
     const checkScreenSize = () => setIsMobileDevice(window.innerWidth < 1024);
@@ -17,16 +23,34 @@ export default function LayoutDashboard() {
 
   if (isMobileDevice) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-8 md:p-30 text-center">
-        <img className="mb-4 md:mb-10" src={ilustrasiLayout} alt="ilustrasi layout" />
-        <h1 className="text-3xl md:text-4xl font-bold text-black mb-4">Perangkat Tidak Didukung</h1>
-        <p className="text-[#737373] text-md md:text-lg mb-6">
-          Web ini sementara belum mendukung ukuran layar dari perangkat Anda. Silakan akses menggunakan perangkat desktop atau laptop untuk pengalaman terbaik.
-        </p>
+      <div className="flex flex-col min-h-screen bg-white">
+        <header className="mobile-header">
+          <div className="flex items-center gap-3">
+            <button aria-label="Buka menu" onClick={() => setIsNavOpen(true)} className="p-2 rounded-md bg-[#f3f3f3]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6H20M4 12H20M4 18H20" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            <h1 className="text-lg font-semibold">Dashboard</h1>
+          </div>
+          <div>
+            <button onClick={handleLogout} className="text-sm text-[#EE0000]">LogOut</button>
+          </div>
+        </header>
 
-        <button onClick={() => navigate('/')} className="mt-6 bg-[#25E82F] text-white px-6 md:px-8 py-2 rounded-xl font-medium">
-          Kembali ke Beranda
-        </button>
+        <main className="flex-1 p-4">
+          <Outlet />
+        </main>
+
+        {isNavOpen && (
+          <div className="mobile-nav-overlay">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Menu</h2>
+              <button aria-label="Tutup menu" onClick={() => setIsNavOpen(false)} className="p-2 rounded-md bg-[#f3f3f3]">Tutup</button>
+            </div>
+            <div>
+              <DashboardNavbar />
+            </div>
+          </div>
+        )}
       </div>
     );
   }

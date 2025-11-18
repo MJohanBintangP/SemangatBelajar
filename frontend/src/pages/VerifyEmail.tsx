@@ -132,18 +132,18 @@ export default function VerifyEmail() {
           <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
         </div>
 
-        <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">
+        <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-full sm:max-w-[400px]">
           Verifikasi Email
         </h1>
 
-        <p className="text-[#878787] mb-6 text-sm max-w-[400px]">
+        <p className="text-[#878787] mb-6 text-sm max-w-full sm:max-w-[400px]">
           Kami telah mengirim kode verifikasi ke <strong>{email}</strong>. 
           Masukkan kode tersebut di bawah ini.
         </p>
 
         {error && <div className="mb-4 text-red-600">{error}</div>}
 
-        <form onSubmit={handleVerify} className="w-80">
+          <form onSubmit={handleVerify} className="w-80 max-w-full">
           <div className="mb-6">
             <h3 className="font-medium">Kode Verifikasi</h3>
             <input

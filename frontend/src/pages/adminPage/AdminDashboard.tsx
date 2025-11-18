@@ -253,7 +253,7 @@ export default function AdminDashboard() {
           <AdminNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </aside>
-      <main className="flex-1 overflow-y-auto px-10 py-5">
+      <main className="flex-1 overflow-y-auto px-4 sm:px-10 py-5">
         <div className="py-10">
           <h2 className="text-2xl font-bold mb-4">Dashboard Admin</h2>
           {pesan && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">{pesan}</div>}
@@ -265,7 +265,7 @@ export default function AdminDashboard() {
               {activeTab === 'laporan' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Daftar Laporan</h3>
-                  <div className="overflow-x-auto rounded-lg shadow">
+                  <div className="overflow-x-auto rounded-lg shadow responsive-table">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
                         <tr>
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
               {activeTab === 'users' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Daftar User</h3>
-                  <div className="overflow-x-auto rounded-lg shadow">
+                  <div className="overflow-x-auto rounded-lg shadow responsive-table">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
                         <tr>
@@ -414,7 +414,7 @@ export default function AdminDashboard() {
               {activeTab === 'forums' && (
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Daftar Forum</h3>
-                  <div className="overflow-x-auto rounded-lg shadow">
+                  <div className="overflow-x-auto rounded-lg shadow responsive-table">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
                         <tr>

@@ -135,11 +135,11 @@ export default function ResetPassword() {
           <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
         </div>
 
-        <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">
+        <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-full sm:max-w-[400px]">
           {step === 'email' ? 'Reset Password' : 'Atur Ulang Password'}
         </h1>
 
-        <p className="text-[#878787] mb-6 text-sm max-w-[400px]">
+        <p className="text-[#878787] mb-6 text-sm max-w-full sm:max-w-[400px]">
           {step === 'email'
             ? 'Masukkan email Anda untuk menerima kode OTP.'
             : `Masukkan kode OTP yang dikirim ke ${email} dan password baru Anda.`}
@@ -149,7 +149,7 @@ export default function ResetPassword() {
 
         {step === 'email' ? (
           // Form: Masukkan Email
-          <form onSubmit={handleSendOTP} className="w-80">
+          <form onSubmit={handleSendOTP} className="w-80 max-w-full">
             <div className="mb-6">
               <h3 className="font-medium">Email</h3>
               <input
@@ -173,7 +173,7 @@ export default function ResetPassword() {
           </form>
         ) : (
           // Form: OTP + Password Baru
-          <form onSubmit={handleResetPassword} className="w-80">
+          <form onSubmit={handleResetPassword} className="w-80 max-w-full">
             <div className="mb-4">
               <h3 className="font-medium">Kode OTP</h3>
               <input

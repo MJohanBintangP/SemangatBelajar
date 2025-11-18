@@ -93,7 +93,7 @@ export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
           </div>
 
           <div className="flex gap-3 justify-end mb-0">
-            <button type="button" onClick={handleCancel} className="cursor-pointer px-6 py-2 border border-gray-200 rounded-lg">
+            <button type="button" onClick={handleCancel} className="cursor-pointer px-3 sm:px-6 py-2 border border-gray-200 rounded-lg">
               Batal
             </button>
             <button type="submit" className="cursor-pointer bg-[#25E82F] text-white px-4 py-2 rounded-lg font-medium">

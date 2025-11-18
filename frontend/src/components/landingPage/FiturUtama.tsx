@@ -76,7 +76,7 @@ export default function FiturUtama() {
     <section id="fitur" className="mt-20 bg-white px-4 md:px-20 lg:px-32 py-10 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Badge Solusi Kami */}
-        <div className="relative left-5 lg:left-40 flex gap-2 items-center bg-black rounded-full px-6 py-1 mb-4 text-white w-fit">
+        <div className="relative left-5 lg:left-40 flex gap-2 items-center bg-black rounded-full px-3 sm:px-6 py-1 mb-4 text-white w-fit">
           <CloverIcon className="overflow-clip rotate-12" size={30} weight="bold" />
           <h3 className="font-semibold">Solusi Kami</h3>
         </div>

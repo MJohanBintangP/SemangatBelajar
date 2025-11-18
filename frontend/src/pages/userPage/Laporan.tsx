@@ -56,7 +56,7 @@ export default function Laporan() {
     <div className="py-10">
       <h2 className="text-2xl font-bold mb-4">Laporan</h2>
       <div className="flex flex-row justify-between items-center mb-12">
-        <div className="bg-[#25E82F]/9 flex px-10 py-3 rounded-xl gap-6">
+        <div className="bg-[#25E82F]/9 flex px-4 sm:px-10 py-3 rounded-xl gap-6">
           <div>
             Total Laporan: <span className="font-bold">{totalLaporan}</span>
           </div>
@@ -74,7 +74,7 @@ export default function Laporan() {
         <div className="text-gray-500">Memuat data...</div>
       ) : riwayat.length === 0 ? (
         <div className="flex flex-col items-center justify-center  rounded-lg py-16">
-          <img src={ilustrasiEmpty} alt="Laporan kosong" className="w-80 mb-6" />
+          <img src={ilustrasiEmpty} alt="Laporan kosong" className="w-80 max-w-full mb-6" />
           <div className="text-2xl font-bold mb-2">Laporan kosong</div>
           <div className="text-gray-500 text-lg text-center">Buat laporan pertamamu terlebih dahulu !</div>
         </div>
@@ -114,7 +114,7 @@ export default function Laporan() {
           </div>
 
           {/* Desktop/table for large screens */}
-          <div className="hidden lg:block overflow-x-auto rounded-2xl shadow">
+          <div className="hidden lg:block overflow-x-auto rounded-2xl shadow responsive-table">
             <table className="min-w-full bg-white rounded-2xl">
               <thead>
               <tr>
@@ -132,7 +132,7 @@ export default function Laporan() {
                 <tr key={laporan.id} className="">
                   <td className="px-4 py-3 font-medium">{idx + 1}</td>
                   <td className="px-4 py-3 font-semibold">{laporan.judul}</td>
-                  <td className="px-4 py-3 max-w-[250px]">{laporan.deskripsi}</td>
+                  <td className="px-4 py-3 max-w-full sm:max-w-[250px]">{laporan.deskripsi}</td>
                   <td className="px-4 py-3">
                     {laporan.foto_url && (
                       <a href={laporan.foto_url} target="_blank" rel="noopener noreferrer" className="text-[#005EFF] block">

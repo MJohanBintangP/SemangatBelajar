@@ -8,10 +8,10 @@ export default function PengenalanWeb() {
     navigate('/login');
   };
   return (
-    <section id="pengenalan" className="mt-20 mx-auto w-full flex flex-col items-center justify-center px-10 md:px-12 lg:px-0">
-      <div className="flex w-full justify-between max-w-[1200px] items-center flex-col lg:flex-row gap-20 md:gap-10">
+    <section id="pengenalan" className="mt-20 mx-auto w-full flex flex-col items-center justify-center px-4 sm:px-10 md:px-12 lg:px-0">
+      <div className="flex w-full justify-between max-w-full lg:max-w-[1200px] items-center flex-col lg:flex-row gap-20 md:gap-10">
         <div className="max-w-xl">
-          <div className="flex gap-2 items-center bg-black rounded-full px-6 py-1 mb-6 text-white w-fit">
+          <div className="flex gap-2 items-center bg-black rounded-full px-3 sm:px-6 py-1 mb-6 text-white w-fit">
             <QuestionMarkIcon className="overflow-clip rotate-30" size={30} weight="bold" />
             <h3 className="font-semibold">Perkenalan</h3>
           </div>
@@ -20,11 +20,11 @@ export default function PengenalanWeb() {
           <p className="text-[#4F4F4F] mb-6 font-medium">
             Ecosteps Report adalah wadah untuk melaporkan berbagai hal yang dapat merusak lingkungan, seperti polusi, deforestasi, pembuangan sampah sembarangan, atau aktivitas ilegal yang membahayakan ekosistem dan lingkungan.{' '}
           </p>
-          <button className="bg-[#009B08] cursor-pointer hover:bg-green-700 duration-200 transition-colors rounded-full px-6 py-2.5 text-white font-medium" onClick={handleButtonClick}>
+          <button className="bg-[#009B08] cursor-pointer hover:bg-green-700 duration-200 transition-colors rounded-full px-3 sm:px-6 py-2.5 text-white font-medium" onClick={handleButtonClick}>
             Coba sekarang
           </button>
         </div>
-        <img className="w-[400px]" src={ilustrasi1} alt="ilustrasi1" />
+        <img className="w-full max-w-[400px]" src={ilustrasi1} alt="ilustrasi1" />
       </div>
     </section>
   );

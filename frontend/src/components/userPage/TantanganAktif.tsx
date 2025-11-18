@@ -27,7 +27,7 @@ export default function TantanganAktif() {
 
   return (
     <div className="my-4">
-      <div className="bg-white px-10 py-6 rounded-[15px] shadow-md">
+      <div className="bg-white px-4 sm:px-10 py-6 rounded-[15px] shadow-md">
         <h3 className="font-bold mb-2">🔥 Tantangan Aktif Hari Ini</h3>
         <ul className="max-h-41 overflow-y-auto text-sm">
           {loading ? (

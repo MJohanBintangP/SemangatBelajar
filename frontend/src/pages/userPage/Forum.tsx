@@ -98,7 +98,7 @@ export default function Forum() {
     <div className="py-10">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Forum</h1>
-        <button className="cursor-pointer bg-white text-black px-6 py-3 rounded-xl font-semibold shadow-md flex items-center" onClick={() => setShowModal(true)}>
+        <button className="cursor-pointer bg-white text-black px-3 sm:px-6 py-3 rounded-xl font-semibold shadow-md flex items-center" onClick={() => setShowModal(true)}>
           <span>+ Buat forum baru</span>
         </button>
       </div>
@@ -116,7 +116,7 @@ export default function Forum() {
               <input type="text" placeholder="Judul forum" className="w-full mb-3 p-3 border border-gray-200 rounded-lg" value={judul} onChange={(e) => setJudul(e.target.value)} required />
               <textarea placeholder="Isi forum" className="w-full mb-8 p-3 border border-gray-200 rounded-lg min-h-[120px]" value={isi} onChange={(e) => setIsi(e.target.value)} required />
               <div className="flex gap-3 justify-end mb-2">
-                <button type="button" className="cursor-pointer px-6 py-2 border border-gray-200 rounded-lg" onClick={() => setShowModal(false)}>
+                <button type="button" className="cursor-pointer px-3 sm:px-6 py-2 border border-gray-200 rounded-lg" onClick={() => setShowModal(false)}>
                   Batal
                 </button>
                 <button type="submit" className="bg-[#25E82F] cursor-pointer font-medium text-white px-4 py-2 rounded-lg">
@@ -133,7 +133,7 @@ export default function Forum() {
           <div className="text-center py-10 text-gray-500">Memuat data...</div>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-lg py-16">
-            <img src={ilustrasiEmpty} alt="Forum kosong" className="w-80 mb-6" />
+            <img src={ilustrasiEmpty} alt="Forum kosong" className="w-80 max-w-full mb-6" />
             <div className="text-2xl font-bold mb-2">Forum kosong</div>
             <div className="text-gray-500 text-lg text-center">Buat forum pertamamu terlebih dahulu!</div>
           </div>
@@ -162,7 +162,7 @@ export default function Forum() {
 
                 <div className="flex mt-2 gap-6">
                   <input type="text" placeholder="Tulis komentar..." className="flex-1 shadow-md rounded-lg p-2" value={commentIsi[post.id] || ''} onChange={(e) => setCommentIsi((prev) => ({ ...prev, [post.id]: e.target.value }))} />
-                  <button className="bg-[#25E82F] cursor-pointer text-white px-6 py-2 rounded-lg" onClick={() => handleComment(post.id)} disabled={!commentIsi[post.id]}>
+                  <button className="bg-[#25E82F] cursor-pointer text-white px-3 sm:px-6 py-2 rounded-lg" onClick={() => handleComment(post.id)} disabled={!commentIsi[post.id]}>
                     Kirim
                   </button>
                 </div>
