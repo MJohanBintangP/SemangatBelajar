@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ilustrasiEmpty from '../../assets/ilustrasiEmpty.svg';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 
 type ForumPost = {
   id: number;
@@ -56,13 +56,27 @@ export default function Forum() {
       return;
     }
     try {
+      if (!token) {
+        setError('Anda harus login untuk membuat forum.');
+        return;
+      }
+
       const res = await fetch(`${API_BASE_URL}/api/forum`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ judul, isi }),
       });
+
+      const txt = await res.text();
+      let data: any = {};
+      try {
+        data = txt ? JSON.parse(txt) : {};
+      } catch {
+        data = { message: txt };
+      }
+
       if (!res.ok) {
-        setError('Gagal membuat forum.');
+        setError(data?.message || 'Gagal membuat forum.');
         return;
       }
       setJudul('');
@@ -77,14 +91,35 @@ export default function Forum() {
 
   async function handleComment(postId: number) {
     if (!commentIsi[postId] || !commentIsi[postId].trim()) return;
-    await fetch(`${API_BASE_URL}/api/forum/${postId}/comment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ isi: commentIsi[postId] }),
-    });
+    if (!token) {
+      setError('Anda harus login untuk mengomentari.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/forum/${postId}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isi: commentIsi[postId] }),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        try {
+          const d = txt ? JSON.parse(txt) : {};
+          setError(d?.message || 'Gagal mengirim komentar.');
+        } catch {
+          setError(txt || 'Gagal mengirim komentar.');
+        }
+        return;
+      }
+    } catch (err) {
+      setError('Gagal koneksi ke server.');
+      return;
+    }
     setCommentIsi((prev) => ({ ...prev, [postId]: '' }));
     fetchForum();
   }

@@ -7,6 +7,8 @@ export function UserProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
+
   async function fetchProfile() {
     setLoading(true);
     const token = localStorage.getItem('token');
@@ -17,7 +19,7 @@ export function UserProvider({ children }: PropsWithChildren) {
     }
 
     try {
-      const res = await fetch('http://localhost:8081/api/user/profile', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${API_BASE_URL}/api/user/profile`, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) {
         setUser(null);
       } else {

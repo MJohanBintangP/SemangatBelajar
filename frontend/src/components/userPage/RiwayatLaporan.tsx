@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 
 type Laporan = {
   id: number;
@@ -20,7 +21,7 @@ export default function RiwayatLaporan() {
     if (!token) return;
 
     setLoading(true);
-    fetch('http://localhost:8081/api/laporan/user', {
+    fetch(`${API_BASE_URL}/api/laporan/user`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.status === 401 ? [] : res.json()))

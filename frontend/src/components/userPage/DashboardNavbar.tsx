@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useUser } from '../../contexts/userContextImpl';
 import Profile from '../../assets/profile.svg';
 import logoNavbar from '../../assets/navbarLogo.svg';
 import * as Phospor from '@phosphor-icons/react';
@@ -11,23 +12,14 @@ export default function DashboardNavbar() {
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const { user } = useUser();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    fetch('http://localhost:8081/api/user/profile', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUsername(data.username || '');
-        setEmail(data.email || '');
-      })
-      .catch(() => {
-        setUsername('');
-        setEmail('');
-      });
-  }, []);
+    if (user) {
+      setUsername(user.username || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
 
   function handleLogout() {
     localStorage.removeItem('token');

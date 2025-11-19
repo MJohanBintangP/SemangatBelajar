@@ -3,6 +3,7 @@ import QuickActions from '../../components/userPage/QuickActions';
 import RiwayatLaporan from '../../components/userPage/RiwayatLaporan';
 import TantanganAktif from '../../components/userPage/TantanganAktif';
 import ArtikelGrid from './Artikel';
+import { useUser } from '../../contexts/userContextImpl';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dashboard() {
@@ -11,19 +12,15 @@ export default function Dashboard() {
   const [totalPoin, setTotalPoin] = useState(0);
   const [totalLaporan, setTotalLaporan] = useState(0);
   const [statusTerbaru, setStatusTerbaru] = useState('-');
+  const { user } = useUser();
 
   useEffect(() => {
+    // username is provided by UserProvider; rely on context to display it.
+    // Keep this effect to fetch other dashboard numbers below.
+    if (user && user.username) setUsername(user.username);
+
     const token = localStorage.getItem('token');
     if (!token) return;
-
-    fetch(`${API_BASE_URL}/api/user/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUsername(data.username || '');
-      })
-      .catch(() => setUsername(''));
 
     fetch(`${API_BASE_URL}/api/tantangan/selesai-hari-ini`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -47,7 +44,7 @@ export default function Dashboard() {
           setStatusTerbaru(data.length > 0 ? data[0].status : '-');
         }
       });
-  }, []);
+  }, [user]);
 
   return (
     <div className="flex flex-col py-10">

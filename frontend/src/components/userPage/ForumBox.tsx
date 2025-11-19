@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 import { useNavigate } from 'react-router-dom';
 
 type Forum = {
@@ -13,7 +14,7 @@ export default function ForumBox() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8081/api/forum')
+    fetch(`${API_BASE_URL}/api/forum`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setForums(data);

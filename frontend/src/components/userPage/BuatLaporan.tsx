@@ -30,7 +30,8 @@ export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
     setPesan('');
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:8081/api/laporan', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
+      const res = await fetch(`${API_BASE_URL}/api/laporan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

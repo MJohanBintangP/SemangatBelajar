@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import BuatLaporan from '../../components/userPage/BuatLaporan';
 import ilustrasiEmpty from '../../assets/ilustrasiEmpty.svg';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 
 type Laporan = {
   id: number;
@@ -22,34 +22,65 @@ export default function Laporan() {
   const [statusTerbaru, setStatusTerbaru] = useState('-');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    const doFetchTotals = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn('No token found; skipping laporan totals fetch');
+        return;
+      }
 
-    fetch(`${API_BASE_URL}/api/laporan/user`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setTotalLaporan(data.length);
-          setStatusTerbaru(data.length > 0 ? data[0].status : '-');
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/laporan/user`, { headers: { Authorization: `Bearer ${token}` } });
+        const txt = await res.text();
+        let data: any = {};
+        try {
+          data = txt ? JSON.parse(txt) : [];
+        } catch {
+          data = {};
         }
-      });
+
+        const arr = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
+        setTotalLaporan(arr.length);
+        setStatusTerbaru(arr.length > 0 ? arr[0].status : '-');
+      } catch (err) {
+        console.warn('Failed to fetch laporan totals', err);
+      }
+    };
+
+    void doFetchTotals();
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    setLoading(true);
-    fetch(`${API_BASE_URL}/api/laporan/user`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setRiwayat(Array.isArray(data) ? data : []);
+    const doFetchRiwayat = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setRiwayat([]);
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/laporan/user`, { headers: { Authorization: `Bearer ${token}` } });
+        const txt = await res.text();
+        let data: any = [];
+        try {
+          data = txt ? JSON.parse(txt) : [];
+        } catch {
+          data = [];
+        }
+
+        const arr = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
+        setRiwayat(arr);
+      } catch (err) {
+        console.warn('Failed to fetch riwayat laporan', err);
+        setRiwayat([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void doFetchRiwayat();
   }, [showPopup]);
 
   return (

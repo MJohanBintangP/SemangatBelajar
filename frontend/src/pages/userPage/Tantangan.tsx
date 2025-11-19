@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ilustrasiRank from '../../assets/ilustrasiRank.svg';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 
 type Tantangan = {
   id: number;
@@ -28,23 +28,40 @@ export default function Tantangan() {
   };
 
   useEffect(() => {
+    // tasks
     fetch(`${API_BASE_URL}/api/tantangan/hari-ini`)
       .then((res) => res.json())
-      .then((data) => setTasks(Array.isArray(data) ? data : []));
+      .then((data) => setTasks(Array.isArray(data) ? data : []))
+      .catch((err) => {
+        // keep empty and log for debugging
+        // console.error('fetch tantangan/hari-ini failed', err);
+        setTasks([]);
+      });
 
     const token = localStorage.getItem('token');
-    fetch(`${API_BASE_URL}/api/user/poin`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setTotalPoin(data.poin || 0));
+    // user poin (protected)
+    if (token) {
+      fetch(`${API_BASE_URL}/api/user/poin`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setTotalPoin(data?.poin || 0))
+        .catch(() => setTotalPoin(0));
 
-    fetch(`${API_BASE_URL}/api/tantangan/selesai-hari-ini`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setCompleted(Array.isArray(data) ? data : []));
+      // selesai hari ini (protected)
+      fetch(`${API_BASE_URL}/api/tantangan/selesai-hari-ini`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setCompleted(Array.isArray(data) ? data : []))
+        .catch(() => setCompleted([]));
+    } else {
+      // no token: ensure defaults
+      setTotalPoin(0);
+      setCompleted([]);
+    }
 
+    // leaderboard (public)
     fetch(`${API_BASE_URL}/api/leaderboard`)
       .then((res) => res.json())
       .then((data) => {
@@ -55,7 +72,8 @@ export default function Tantangan() {
             }))
           : [];
         setLeaderboard(processedData);
-      });
+      })
+      .catch(() => setLeaderboard([]));
   }, []);
 
   function handleCheck(tantangan: Tantangan) {

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useUser } from '../../contexts/userContextImpl';
 import Profile from '../../assets/profile.svg';
 import logoNavbar from '../../assets/navbarLogo.svg';
 import * as Phospor from '@phosphor-icons/react';
@@ -15,24 +16,15 @@ export default function AdminNavbar({ activeTab, setActiveTab, username, email }
   const navigate = useNavigate();
   const [usernameState, setUsernameState] = useState(username || '');
   const [emailState, setEmailState] = useState(email || '');
+  const { user } = useUser();
 
   useEffect(() => {
     if (username || email) return;
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    fetch('http://localhost:8081/api/user/profile', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUsernameState(data.username || '');
-        setEmailState(data.email || '');
-      })
-      .catch(() => {
-        setUsernameState('');
-        setEmailState('');
-      });
-  }, [username, email]);
+    if (user) {
+      setUsernameState(user.username || '');
+      setEmailState(user.email || '');
+    }
+  }, [username, email, user]);
 
   function handleLogout() {
     localStorage.removeItem('token');

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 
 type Tantangan = {
   id: number;
@@ -14,7 +15,7 @@ export default function TantanganAktif() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:8081/api/tantangan/hari-ini')
+    fetch(`${API_BASE_URL}/api/tantangan/hari-ini`)
       .then((res) => res.json())
       .then((data) => {
         setTasks(Array.isArray(data) ? data : []);

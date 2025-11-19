@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 
 type Article = {
   title: string;
@@ -53,15 +53,45 @@ export default function ArtikelGrid({ limit = 8, isDashboard = false }: ArtikelG
   const isArtikelPage = location.pathname === '/Artikel';
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/artikel`)
-      .then((res) => res.json())
-      .then((data) => {
-        const all = Array.isArray(data.articles) ? data.articles : [];
+    const doFetch = async () => {
+      if (!API_BASE_URL) {
+        console.warn('VITE_API_BASE_URL is not set; skipping artikel fetch');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/artikel`);
+        const txt = await res.text();
+        let data: any = {};
+        try {
+          data = txt ? JSON.parse(txt) : {};
+        } catch {
+          // if response is plain array JSON, fallback to parsing directly from text
+          try {
+            data = JSON.parse(txt);
+          } catch {
+            data = {};
+          }
+        }
+
+        // Support backends that return either an array or an object with `articles`.
+        const all = Array.isArray(data)
+          ? data
+          : Array.isArray(data.articles)
+          ? data.articles
+          : [];
+
         const filtered = all.filter(isLingkungan).slice(0, limit);
         setArticles(filtered);
+      } catch (err) {
+        console.warn('Failed to fetch articles', err);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    doFetch();
   }, [limit]);
 
   if (loading) return <div>Memuat artikel...</div>;
