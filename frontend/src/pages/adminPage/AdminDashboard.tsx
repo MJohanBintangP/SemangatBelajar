@@ -30,6 +30,71 @@ type Forum = {
 };
 
 export default function AdminDashboard() {
+    // Fungsi hapus user
+    async function handleDeleteUser(id: number) {
+      setPesan('');
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/user/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id }),
+      });
+      const data = await parseResponse(res);
+      if (!res.ok) {
+        const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal hapus user';
+        setPesan(msg);
+        return;
+      }
+      setPesan('User berhasil dihapus');
+      fetchAllData();
+    }
+
+    // Fungsi hapus forum
+    async function deleteForum(id: number) {
+      setPesan('');
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/forum/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id }),
+      });
+      const data = await parseResponse(res);
+      if (!res.ok) {
+        const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal hapus forum';
+        setPesan(msg);
+        return;
+      }
+      setPesan('Forum berhasil dihapus');
+      fetchAllData();
+    }
+
+    // Fungsi hapus laporan
+    async function deleteLaporan(id: number) {
+      setPesan('');
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/api/laporan/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id }),
+      });
+      const data = await parseResponse(res);
+      if (!res.ok) {
+        const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal hapus laporan';
+        setPesan(msg);
+        return;
+      }
+      setPesan('Laporan berhasil dihapus');
+      fetchAllData();
+    }
   const [laporan, setLaporan] = useState<Laporan[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [forums, setForums] = useState<Forum[]>([]);
@@ -37,12 +102,18 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('laporan');
   const [role, setRole] = useState<string>('');
-  const [editUserId, setEditUserId] = useState<number | null>(null);
+  
   const [editUsername, setEditUsername] = useState('');
   const [editRole, setEditRole] = useState('user');
+  const [showMiniTab, setShowMiniTab] = useState<number | null>(null);
+  const [openedForum, setOpenedForum] = useState<Forum | null>(null);
+  const [forumMessages, setForumMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState('');
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+  const [showDeleteUserOverlay, setShowDeleteUserOverlay] = useState<{ id: number, username: string } | null>(null);
+  const [showDeleteForumOverlay, setShowDeleteForumOverlay] = useState<{ id: number, judul: string } | null>(null);
+  const [showDeleteLaporanOverlay, setShowDeleteLaporanOverlay] = useState<{ id: number, judul: string } | null>(null);
   // Robust response parser: try res.json(), fallback to text when JSON parsing fails
   async function parseResponse(res: Response): Promise<unknown> {
     try {
@@ -143,85 +214,8 @@ export default function AdminDashboard() {
     setPesan('Status berhasil diupdate');
     fetchAllData();
   }
+ 
 
-  async function deleteLaporan(id: number) {
-    if (!window.confirm('Yakin ingin menghapus laporan ini?')) return;
-    setPesan('');
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE_URL}/api/laporan/delete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ id }),
-    });
-    const data = await parseResponse(res);
-    if (!res.ok) {
-      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus laporan';
-      setPesan(msg);
-      return;
-    }
-    setPesan('Laporan berhasil dihapus');
-    fetchAllData();
-  }
-
-  async function deleteForum(id: number) {
-    if (!window.confirm('Yakin ingin menghapus forum ini?')) return;
-    setPesan('');
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE_URL}/api/forum/delete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ id }),
-    });
-    const data = await parseResponse(res);
-    if (!res.ok) {
-      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus forum';
-      setPesan(msg);
-      return;
-    }
-    setPesan('Forum berhasil dihapus');
-    fetchAllData();
-  }
-
-  async function handleEditUser(u: User) {
-    setEditUserId(u.id);
-    setEditUsername(u.username);
-    setEditRole(u.role);
-  }
-
-  function handleCancelEdit() {
-    setEditUserId(null);
-    setEditUsername('');
-    setEditRole('user');
-  }
-
-  async function handleDeleteUser(id: number) {
-    if (!window.confirm('Yakin ingin menghapus pengguna ini ?')) return;
-    setPesan('');
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${API_BASE_URL}/api/user/delete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ id }),
-    });
-    const data = await parseResponse(res);
-    if (!res.ok) {
-      const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal menghapus user';
-      setPesan(msg);
-      return;
-    }
-    setPesan('User berhasil dihapus');
-    setEditUserId(null);
-    fetchAllData();
-  }
 
   async function handleSaveEditUser(id: number) {
     setPesan('');
@@ -241,8 +235,59 @@ export default function AdminDashboard() {
       return;
     }
     setPesan('User berhasil diupdate');
-    setEditUserId(null);
     fetchAllData();
+  }
+
+  // Fungsi untuk menampilkan overlay
+  function handleShowOverlay(userId: number) {
+    setShowMiniTab(userId);
+  }
+
+  // Fungsi untuk menyembunyikan overlay
+  function handleHideOverlay() {
+    setShowMiniTab(null);
+  }
+
+  // Tambahkan fungsi untuk membuka forum
+  async function handleOpenForum(forumId: number) {
+    const token = localStorage.getItem('token');
+    try {
+      const forum = forums.find(f => f.id === forumId) || null;
+      setOpenedForum(forum);
+
+      // Ubah endpoint di sini
+      const res = await fetch(`${API_BASE_URL}/api/forum/${forumId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await parseResponse(res);
+      // Type assertion agar TypeScript tahu bentuk data
+      const forumData = data as { comments?: any[] };
+      setForumMessages(Array.isArray(forumData.comments) ? forumData.comments : []);
+    } catch (err) {
+      setPesan('Gagal memuat forum');
+    }
+  }
+
+  
+
+  async function handleSendMessage() {
+    if (!openedForum || !newMessage.trim()) return;
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/api/forum/${openedForum.id}/comment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ isi: newMessage }),
+    });
+    if (res.ok) {
+      setNewMessage('');
+      // Tambahkan ini agar komentar langsung ter-refresh
+      await handleOpenForum(openedForum.id);
+    } else {
+      setPesan('Gagal mengirim pesan');
+    }
   }
 
   return (
@@ -254,8 +299,95 @@ export default function AdminDashboard() {
       </aside>
       <main className="flex-1 overflow-y-auto px-10 py-5">
         <div className="py-10">
-          <h2 className="text-2xl font-bold mb-4">Dashboard Admin</h2>
+          <h2 className="text-22 font-bold mb-4">Dashboard Admin</h2>
           {pesan && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">{pesan}</div>}
+
+          {showDeleteUserOverlay && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+              <div className="bg-white p-6 rounded-2xl shadow-lg max-w-md w-full flex flex-col items-center">
+                <h3 className="text-lg font-bold mb-4 text-center">Konfirmasi Hapus User</h3>
+                <p className="mb-4 text-center">
+                  Yakin ingin menghapus user <span className="font-semibold">{showDeleteUserOverlay.username}</span>?<br />
+                  Tindakan ini tidak dapat dibatalkan.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
+                    onClick={async () => {
+                      await handleDeleteUser(showDeleteUserOverlay.id);
+                      setShowDeleteUserOverlay(null);
+                    }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    className="bg-red-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
+                    onClick={() => setShowDeleteUserOverlay(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showDeleteForumOverlay && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+              <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full flex flex-col items-center">
+                <h3 className="text-lg font-bold mb-2 text-center">Konfirmasi Hapus Forum</h3>
+                <p className="mb-4 text-center">
+                  Yakin ingin menghapus forum <span className="font-semibold">{showDeleteForumOverlay.judul}</span>? <br />
+                  Tindakan ini tidak dapat dibatalkan.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
+                    onClick={async () => {
+                      await deleteForum(showDeleteForumOverlay.id);
+                      setShowDeleteForumOverlay(null);
+                    }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    className="bg-red-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
+                    onClick={() => setShowDeleteForumOverlay(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showDeleteLaporanOverlay && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+              <div className="bg-white p-6 rounded-2xl shadow-lg max-w-md w-full flex flex-col items-center">
+                <h3 className="text-lg font-bold mb-4 text-center">Konfirmasi Hapus Laporan</h3>
+                <p className="mb-4 text-center">
+                  Yakin ingin menghapus laporan <span className="font-semibold">{showDeleteLaporanOverlay.judul}</span>?<br />
+                  Tindakan ini tidak dapat dibatalkan.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-green-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
+                    onClick={async () => {
+                      await deleteLaporan(showDeleteLaporanOverlay.id);
+                      setShowDeleteLaporanOverlay(null);
+                    }}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    className="bg-red-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
+                    onClick={() => setShowDeleteLaporanOverlay(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {loading ? (
             <div className="text-center text-gray-500 py-8">Memuat data...</div>
           ) : (
@@ -263,7 +395,7 @@ export default function AdminDashboard() {
               {/* Laporan Tab */}
               {activeTab === 'laporan' && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Daftar Laporan</h3>
+                  <h3 className="text-2 font-semibold mb-4">Daftar Laporan</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
@@ -327,7 +459,7 @@ export default function AdminDashboard() {
                                   >
                                     Selesai
                                   </button>
-                                  <button className="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer hover:bg-red-700" onClick={() => deleteLaporan(l.id)}>
+                                  <button className="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer hover:bg-red-700" onClick={() => setShowDeleteLaporanOverlay({ id: l.id, judul: l.judul })}>
                                     Hapus
                                   </button>
                                 </div>
@@ -369,33 +501,64 @@ export default function AdminDashboard() {
                             <tr key={u.id} className="border-t hover:bg-gray-50">
                               <td className="px-4 py-3">{u.id}</td>
                               <td className="px-4 py-3">{u.email}</td>
-                              <td className="px-4 py-3">{editUserId === u.id ? <input type="text" className="border rounded px-2 py-1 text-sm" value={editUsername} onChange={(e) => setEditUsername(e.target.value)} /> : u.username}</td>
+                              <td className="px-4 py-3">{u.username}</td>
                               <td className="px-4 py-3">
-                                {editUserId === u.id ? (
-                                  <select className="border rounded px-2 py-1 text-sm" value={editRole} onChange={(e) => setEditRole(e.target.value)}>
-                                    <option value="user">user</option>
-                                    <option value="admin">admin</option>
-                                  </select>
-                                ) : (
-                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>{u.role}</span>
-                                )}
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                                  }`}
+                                >
+                                  {u.role}
+                                </span>
                               </td>
                               <td className="px-4 py-3">{u.poin}</td>
                               <td className="px-4 py-3">
-                                {editUserId === u.id ? (
-                                  <div className="flex gap-2">
-                                    <button className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" onClick={() => handleSaveEditUser(u.id)}>
-                                      Simpan
-                                    </button>
-                                    <button className="bg-gray-400 text-white px-2 py-1 rounded text-xs hover:bg-gray-500" onClick={handleCancelEdit}>
-                                      Batal
-                                    </button>
-                                    <button className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" onClick={() => handleDeleteUser(u.id)}>
-                                      Hapus
-                                    </button>
+                                {showMiniTab === u.id ? (
+                                  <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+                                    <div className="bg-white p-6 rounded-2xl shadow-lg max-w-sm w-full">
+                                      <h3 className="text-lg font-bold mb-4">Edit User</h3>
+                                      <input
+                                        type="text"
+                                        className="border rounded px-2 py-1 text-sm mb-4 w-full"
+                                        placeholder="Ganti Username"
+                                        value={editUsername}
+                                        onChange={(e) => setEditUsername(e.target.value)}
+                                      />
+                                      <select
+                                        className="border rounded px-2 py-1 text-sm mb-4 w-full"
+                                        value={editRole}
+                                        onChange={(e) => setEditRole(e.target.value)}
+                                      >
+                                        <option value="user">user</option>
+                                        <option value="admin">admin</option>
+                                      </select>
+                                      <div className="flex justify-end gap-2">
+                                        <button
+                                          className="W-Full bg-red-600 text-white px-4 py-2 rounded-2xl text-sm hover:bg-red-700 border-2 border-gray-300"
+                                          onClick={() => setShowDeleteUserOverlay({ id: u.id, username: u.username })}
+                                        >
+                                          Hapus User
+                                        </button>
+                                        <button
+                                          className="W-Full bg-[#C4C7C1] text-black px-4 py-2 rounded-2xl text-sm hover:bg-gray-700 border-2 border-gray-300"
+                                          onClick={handleHideOverlay}
+                                        >
+                                          Batal
+                                        </button>
+                                        <button
+                                          className="bg-[#32C439] text-white px-4 py-2 rounded-2xl text-sm hover:bg-green-700 border-2 border-gray-300"
+                                          onClick={() => handleSaveEditUser(u.id)}
+                                        >
+                                          Konfirmasi
+                                        </button>
+                                      </div>
+                                    </div>
                                   </div>
                                 ) : (
-                                  <button className="bg-yellow-500 text-white px-2 py-1 rounded text-xs hover:bg-yellow-600" onClick={() => handleEditUser(u)}>
+                                  <button
+                                    className="bg-yellow-500 text-white px-2 py-1 rounded text-xs hover:bg-yellow-600"
+                                    onClick={() => handleShowOverlay(u.id)}
+                                  >
                                     Edit
                                   </button>
                                 )}
@@ -412,7 +575,7 @@ export default function AdminDashboard() {
               {/* Forums Tab */}
               {activeTab === 'forums' && (
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Daftar Forum</h3>
+                  <h3 className="text-2 font-semibold mb-4">Daftar Forum</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg">
                       <thead>
@@ -439,17 +602,65 @@ export default function AdminDashboard() {
                               <td className="px-4 py-3">{f.user}</td>
                               <td className="px-4 py-3">{new Date(f.created_at).toLocaleDateString()}</td>
                               <td className="px-4 py-3">
-                                {role === 'admin' && (
-                                  <button className="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer" onClick={() => deleteForum(f.id)}>
-                                    Hapus
+                                <div className="flex gap-2">
+                                  <button
+                                    className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700"
+                                    onClick={() => handleOpenForum(f.id)}
+                                  >
+                                    Open
                                   </button>
-                                )}
+                                  {role === 'admin' && (
+                                    <button
+                                      className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700"
+                                      onClick={() => setShowDeleteForumOverlay({ id: f.id, judul: f.judul })}
+                                    >
+                                      Hapus
+                                    </button>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))
                         )}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              )}
+              {openedForum && (
+                <div className="mt-8 p-6 bg-gray-50 rounded-lg shadow">
+                  <h4 className="text-lg font-bold mb-2">{openedForum.judul}</h4>
+                  <div className="text-sm text-gray-600 mb-4">Author: {openedForum.user}</div>
+                  <div className="mb-4">
+                    <h5 className="font-semibold mb-2">Pesan Forum:</h5>
+                    <div className="space-y-2">
+                      {forumMessages.length === 0 ? (
+                        <div className="text-gray-500">Belum ada pesan.</div>
+                      ) : (
+                        forumMessages.map((msg, idx) => (
+                          <div key={idx} className="bg-white p-2 rounded border">
+                            <div className="font-bold">{msg.user}</div>
+                            <div>{msg.isi}</div>
+                            <div className="text-xs text-gray-400">{msg.created_at && new Date(msg.created_at).toLocaleString()}</div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    <input
+                      type="text"
+                      className="border rounded px-2 py-1 flex-1"
+                      placeholder="Tulis pesan..."
+                      value={newMessage}
+                      onChange={e => setNewMessage(e.target.value)}
+                    />
+                    <button
+                      className="bg-blue-600 text-white px-4 py-1 rounded"
+                      onClick={handleSendMessage}
+                    >
+                      Kirim
+                    </button>
                   </div>
                 </div>
               )}

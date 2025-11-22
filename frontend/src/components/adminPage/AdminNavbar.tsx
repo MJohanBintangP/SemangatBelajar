@@ -46,7 +46,7 @@ export default function AdminNavbar({ activeTab, setActiveTab }: AdminNavbarProp
           <img src={Profile} alt="Profile" className="w-12 rounded-full" />
           <div className="flex flex-col justify-center">
             <div className="font-bold">{username || '...'}</div>
-            <div className="text-xs text-[#9D9D9D]">{email || '...'}</div>
+            <div className="text-xs text-[#9D9D9D]">{(email?.length > 10 ? email.slice (0, 15) + '...' : email) || '...'}</div>
             <div className="text-xs font-medium text-green-600">Administrator</div>
           </div>
         </div>
