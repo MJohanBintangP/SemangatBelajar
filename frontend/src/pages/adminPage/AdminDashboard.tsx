@@ -37,6 +37,17 @@ type ForumMessage = {
   created_at: string;
 };
 
+type TantanganUser = {
+  id: number;
+  user_id: number;
+  tantangan_id: number;
+  status: string;
+  foto_path: string;
+  waktu_selesai: string | null;
+  username?: string;
+  judul?: string;
+};
+
 export default function AdminDashboard() {
   // Fungsi hapus user
   async function handleDeleteUser(id: number) {
@@ -106,6 +117,7 @@ export default function AdminDashboard() {
   const [laporan, setLaporan] = useState<Laporan[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [forums, setForums] = useState<Forum[]>([]);
+  const [tantanganUser, setTantanganUser] = useState<TantanganUser[]>([]);
   const [pesan, setPesan] = useState('');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('laporan');
@@ -157,6 +169,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchAllData();
+    fetchTantanganUser();
     const storedRole = localStorage.getItem('role');
     setRole(storedRole || '');
     // eslint-disable-next-line
@@ -208,6 +221,15 @@ export default function AdminDashboard() {
       setPesan('Gagal mengambil data dari server');
     }
     setLoading(false);
+  }
+
+  async function fetchTantanganUser() {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/api/tantangan/pending`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await parseResponse(res);
+    setTantanganUser(Array.isArray(data) ? data : []);
   }
 
   async function updateStatus(id: number, status: string) {
@@ -304,6 +326,46 @@ export default function AdminDashboard() {
     } else {
       setPesan('Gagal mengirim pesan');
     }
+  }
+
+  async function handleApproveTantangan(id: number, user_id: number, tantangan_id: number) {
+    setPesan('');
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/api/tantangan/approve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ tantangan_user_id: id }),
+    });
+    const data = await parseResponse(res);
+    if (!res.ok) {
+      setPesan(typeof data === 'string' ? data : 'Gagal approve tantangan');
+      return;
+    }
+    setPesan('Tantangan berhasil diapprove');
+    fetchTantanganUser();
+  }
+
+  async function handleRejectTantangan(id: number) {
+    setPesan('');
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/api/tantangan/reject`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ tantangan_user_id: id }),
+    });
+    const data = await parseResponse(res);
+    if (!res.ok) {
+      setPesan(typeof data === 'string' ? data : 'Gagal reject tantangan');
+      return;
+    }
+    setPesan('Tantangan berhasil direject');
+    fetchTantanganUser();
   }
 
   return (
@@ -645,7 +707,8 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         ))
-                      )}
+                      )
+                      }
                     </div>
                   </div>
 
@@ -665,6 +728,66 @@ export default function AdminDashboard() {
                     <button className="bg-[#2E7D32] hover:bg-[#27692b] text-white px-4 py-2 rounded-lg text-sm" onClick={handleSendMessage} aria-label="Kirim pesan">
                       Kirim
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Tantangan Tab */}
+              {activeTab === 'tantangan' && (
+                <div>
+                  <h3 className="text-xl font-semibold mb-4">Approval Tantangan User</h3>
+                  <div className="overflow-x-auto rounded-lg shadow">
+                    <table className="min-w-full bg-white rounded-lg">
+                      <thead>
+                        <tr>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-lg">ID</th>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left">User</th>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Judul Tantangan</th>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Foto</th>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Status</th>
+                          <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tr-lg">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tantanganUser.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="text-center text-gray-500 py-4">
+                              Tidak ada tantangan pending.
+                            </td>
+                          </tr>
+                        ) : (
+                          tantanganUser.map((t) => (
+                            <tr key={t.id} className="border-t hover:bg-gray-50">
+                              <td className="px-4 py-3">{t.id}</td>
+                              <td className="px-4 py-3">{t.username || t.user_id}</td>
+                              <td className="px-4 py-3">{t.judul || t.tantangan_id}</td>
+                              <td className="px-4 py-3">
+                                {t.foto_path ? (
+                                  <a href={`http://localhost:8081/tmp/${t.foto_path}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                                    Lihat Foto
+                                  </a>
+                                ) : (
+                                  'Tidak ada foto'
+                                )}
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">{t.status}</span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex gap-2">
+                                  <button className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" onClick={() => handleApproveTantangan(t.id, t.user_id, t.tantangan_id)}>
+                                    Approve
+                                  </button>
+                                  <button className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" onClick={() => handleRejectTantangan(t.id)}>
+                                    Reject
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               )}
