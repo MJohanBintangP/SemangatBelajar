@@ -1,7 +1,7 @@
-// src/pages/VerifyEmail.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeftIcon } from '@phosphor-icons/react';
+import ilustrasiverify from '../assets/ilustrasilogin.svg';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
 
@@ -123,71 +123,57 @@ export default function VerifyEmail() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="flex flex-col px-20 lg:px-0">
-        <div 
-          onClick={() => navigate('/register')} 
-          className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer"
-        >
-          <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
-        </div>
-
-        <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">
-          Verifikasi Email
-        </h1>
-
-        <p className="text-[#878787] mb-6 text-sm max-w-[400px]">
-          Kami telah mengirim kode verifikasi ke <strong>{email}</strong>. 
-          Masukkan kode tersebut di bawah ini.
-        </p>
-
-        {error && <div className="mb-4 text-red-600">{error}</div>}
-
-        <form onSubmit={handleVerify} className="w-80">
-          <div className="mb-6">
-            <h3 className="font-medium">Kode Verifikasi</h3>
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="123456"
-              className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-              required
-              maxLength={6}
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              Kode berlaku {countdown} detik
-            </p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-white">
+      <div className="flex justify-between items-center">
+        <div className="flex flex-col px-20 lg:px-0">
+          <div onClick={() => navigate('/register')} className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer">
+            <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || otp.length !== 6}
-            className={`w-full py-2 rounded-full font-semibold text-white ${
-              loading || otp.length !== 6 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-[#25E82F] hover:bg-green-700'
-            } transition-colors`}
-          >
-            {loading ? 'Memverifikasi...' : 'Verifikasi Email'}
-          </button>
+          <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">Verifikasi Email</h1>
 
-          <p className="text-center text-sm text-[#454545] mt-4">
-            {canResend ? (
-              <button
-                type="button"
-                onClick={handleResendOTP}
-                disabled={loading}
-                className="text-[#008207] hover:underline disabled:text-gray-400"
-              >
-                Kirim ulang kode
-              </button>
-            ) : (
-              `Kirim ulang dalam ${countdown} detik`
-            )}
+          <p className="text-[#878787] mb-6 text-sm max-w-[400px]">
+            Kami telah mengirim kode verifikasi ke <strong>{email}</strong>. Masukkan kode tersebut di bawah ini.
           </p>
-        </form>
+
+          {error && <div className="mb-4 text-red-600">{error}</div>}
+
+          <form onSubmit={handleVerify} className="w-80">
+            <div className="mb-6">
+              <h3 className="font-medium">Kode Verifikasi</h3>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="123456"
+                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                required
+                maxLength={6}
+              />
+              <p className="text-xs text-gray-500 mt-2">Kode berlaku {countdown} detik</p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || otp.length !== 6}
+              className={`w-full py-2 rounded-full font-semibold text-white ${loading || otp.length !== 6 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}
+            >
+              {loading ? 'Memverifikasi...' : 'Verifikasi Email'}
+            </button>
+
+            <p className="text-center text-sm text-[#454545] mt-4">
+              {canResend ? (
+                <button type="button" onClick={handleResendOTP} disabled={loading} className="text-[#008207] hover:underline disabled:text-gray-400">
+                  Kirim ulang kode
+                </button>
+              ) : (
+                `Kirim ulang dalam ${countdown} detik`
+              )}
+            </p>
+          </form>
+        </div>
+        <img className="hidden lg:block relative -right-25" src={ilustrasiverify} alt="Ilustrasi Verifikasi Email" />
       </div>
     </div>
   );

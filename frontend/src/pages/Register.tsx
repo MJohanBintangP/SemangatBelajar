@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import ilustrasiRegister from '../assets/ilustrasilogin.svg';
-import { ArrowLeftIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon, Eye, EyeSlash } from '@phosphor-icons/react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -10,6 +10,7 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
@@ -79,7 +80,25 @@ export default function Register() {
             </div>
             <div className="mb-8">
               <h3 className="font-medium">Password</h3>
-              <input type="password" placeholder="passwordExample" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="passwordExample"
+                  className="focus:outline-none w-full py-2 pr-10 border-b border-gray-300 placeholder:text-[#D0D0D0]"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  aria-label="Password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-gray-600 hover:text-gray-800"
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                >
+                  {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <p className="text-sm text-[#454545] mb-8">
