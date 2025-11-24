@@ -124,65 +124,124 @@ func TambahKomentarForum(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	authHeader := r.Header.Get("Authorization")
-	if !strings.HasPrefix(authHeader, "Bearer ") {
-		writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
-		return
-	}
-	tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
-	token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
-		return
-	}
-	userID := int(claims["user_id"].(float64))
-
+	// Split path parts early to use for both GET (single forum) and POST (add comment)
 	parts := strings.Split(r.URL.Path, "/")
-	if len(parts) < 5 {
-		writeJSONError(w, http.StatusBadRequest, "forum_id tidak valid")
-		return
-	}
-	forumID, err := strconv.Atoi(parts[3])
-	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "forum_id tidak valid")
+
+	// Handle GET /api/forum/{id} -> return single forum with comments
+	if r.Method == "GET" {
+		if len(parts) < 4 {
+			writeJSONError(w, http.StatusBadRequest, "forum_id tidak valid")
+			return
+		}
+		forumID, err := strconv.Atoi(parts[3])
+		if err != nil {
+			writeJSONError(w, http.StatusBadRequest, "forum_id tidak valid")
+			return
+		}
+
+		var f ForumPost
+		var createdAt time.Time
+		err = config.DB.QueryRow(context.Background(),
+			`SELECT f.id, u.username, f.judul, f.isi, f.created_at
+			 FROM forum f
+			 JOIN users u ON f.user_id = u.id
+			 WHERE f.id=$1`, forumID).Scan(&f.ID, &f.User, &f.Judul, &f.Isi, &createdAt)
+		if err != nil {
+			writeJSONError(w, http.StatusNotFound, "forum_id tidak ditemukan")
+			return
+		}
+		f.CreatedAt = createdAt.Format(time.RFC3339)
+
+		commentRows, _ := config.DB.Query(context.Background(),
+			`SELECT fc.id, u.username, fc.isi, fc.created_at
+			 FROM forum_comment fc
+			 JOIN users u ON fc.user_id = u.id
+			 WHERE fc.forum_id=$1
+			 ORDER BY fc.created_at DESC`, f.ID)
+		var comments []ForumComment
+		for commentRows.Next() {
+			var c ForumComment
+			var cAt time.Time
+			commentRows.Scan(&c.ID, &c.User, &c.Isi, &cAt)
+			c.CreatedAt = cAt.Format(time.RFC3339)
+			comments = append(comments, c)
+		}
+		commentRows.Close()
+		if comments == nil {
+			comments = []ForumComment{}
+		}
+		f.Comments = comments
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(f)
 		return
 	}
 
-	// Validasi apakah forum_id ada di database
-	var exists bool
-	err = config.DB.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM forum WHERE id=$1)", forumID).Scan(&exists)
-	if err != nil || !exists {
-		writeJSONError(w, http.StatusNotFound, "forum_id tidak ditemukan")
+	// For POST (add comment) continue with auth and validation
+	if r.Method == "POST" {
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
+		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			return jwtKey, nil
+		})
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
+		userID := int(claims["user_id"].(float64))
+
+		if len(parts) < 5 {
+			writeJSONError(w, http.StatusBadRequest, "forum_id tidak valid")
+			return
+		}
+		forumID, err := strconv.Atoi(parts[3])
+		if err != nil {
+			writeJSONError(w, http.StatusBadRequest, "forum_id tidak valid")
+			return
+		}
+
+		// Validasi apakah forum_id ada di database
+		var exists bool
+		err = config.DB.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM forum WHERE id=$1)", forumID).Scan(&exists)
+		if err != nil || !exists {
+			writeJSONError(w, http.StatusNotFound, "forum_id tidak ditemukan")
+			return
+		}
+
+		// Logging tambahan untuk debugging
+		log.Printf("Memeriksa forum_id: %d", forumID)
+		log.Printf("Hasil validasi forum_id: %v", exists)
+
+		var req struct {
+			Isi string `json:"isi"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeJSONError(w, http.StatusBadRequest, "Request tidak valid")
+			return
+		}
+		if strings.TrimSpace(req.Isi) == "" {
+			writeJSONError(w, http.StatusBadRequest, "Isi komentar tidak boleh kosong")
+			return
+		}
+		_, err = config.DB.Exec(context.Background(),
+			"INSERT INTO forum_comment (forum_id, user_id, isi) VALUES ($1, $2, $3)",
+			forumID, userID, req.Isi)
+		if err != nil {
+			writeJSONError(w, http.StatusInternalServerError, "Gagal menambah komentar")
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Komentar berhasil ditambahkan"})
 		return
 	}
 
-	// Logging tambahan untuk debugging
-	log.Printf("Memeriksa forum_id: %d", forumID)
-	log.Printf("Hasil validasi forum_id: %v", exists)
-
-	var req struct {
-		Isi string `json:"isi"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Request tidak valid")
-		return
-	}
-	if strings.TrimSpace(req.Isi) == "" {
-		writeJSONError(w, http.StatusBadRequest, "Isi komentar tidak boleh kosong")
-		return
-	}
-	_, err = config.DB.Exec(context.Background(),
-		"INSERT INTO forum_comment (forum_id, user_id, isi) VALUES ($1, $2, $3)",
-		forumID, userID, req.Isi)
-	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Gagal menambah komentar")
-		return
-	}
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Komentar berhasil ditambahkan"})
+	// Other methods not allowed
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
 func ForumHandler(w http.ResponseWriter, r *http.Request) {

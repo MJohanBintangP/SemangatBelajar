@@ -1,8 +1,8 @@
-// src/pages/ResetPassword.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import ilustrasiReset from '../assets/ilustrasilogin.svg';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ export default function ResetPassword() {
       let data;
       try {
         data = await res.json();
-      } catch (jsonError) {
+      } catch {
         throw new Error('Respons server tidak valid');
       }
 
@@ -87,7 +87,7 @@ export default function ResetPassword() {
       let verifyData;
       try {
         verifyData = await verifyRes.json();
-      } catch (jsonError) {
+      } catch {
         throw new Error('Respons verifikasi OTP tidak valid');
       }
 
@@ -106,7 +106,7 @@ export default function ResetPassword() {
       let resetData;
       try {
         resetData = await resetRes.json();
-      } catch (jsonError) {
+      } catch {
         throw new Error('Respons reset password tidak valid');
       }
 
@@ -121,114 +121,86 @@ export default function ResetPassword() {
       console.error(err);
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan tidak terduga');
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="flex flex-col px-20 lg:px-0">
-        <div 
-          onClick={() => navigate('/')} 
-          className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer"
-        >
-          <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
+    <div className="min-h-screen w-full flex items-center justify-center bg-white">
+      <div className="flex justify-between items-center">
+        <div className="flex flex-col px-20 lg:px-0">
+          <div onClick={() => navigate('/')} className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer">
+            <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
+          </div>
+
+          <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">{step === 'email' ? 'Reset Password' : 'Atur Ulang Password'}</h1>
+
+          <p className="text-[#878787] mb-6 text-sm max-w-[400px]">{step === 'email' ? 'Masukkan email Anda untuk menerima kode OTP.' : `Masukkan kode OTP yang dikirim ke ${email} dan password baru Anda.`}</p>
+
+          {error && <div className="mb-4 text-red-600">{error}</div>}
+
+          {step === 'email' ? (
+            // Form: Masukkan Email
+            <form onSubmit={handleSendOTP} className="w-80">
+              <div className="mb-6">
+                <h3 className="font-medium">Email</h3>
+                <input type="email" placeholder="name@example.com" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
+
+              <p className="text-sm text-[#454545] mb-4">
+                Sudah punya akun?{' '}
+                <span className="text-[#008207] hover:underline cursor-pointer" onClick={() => navigate('/login')}>
+                  Masuk
+                </span>
+              </p>
+
+              <button type="submit" disabled={loading} className={`w-full py-2 rounded-full font-semibold text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}>
+                {loading ? 'Mengirim...' : 'Kirim OTP'}
+              </button>
+            </form>
+          ) : (
+            // Form: OTP + Password Baru
+            <form onSubmit={handleResetPassword} className="w-80">
+              <div className="mb-4">
+                <h3 className="font-medium">Kode OTP</h3>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="123456"
+                  className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  required
+                  maxLength={6}
+                />
+              </div>
+              <div className="mb-4">
+                <h3 className="font-medium">Password Baru</h3>
+                <input type="password" placeholder="Password baru" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </div>
+              <div className="mb-6">
+                <h3 className="font-medium">Konfirmasi Password</h3>
+                <input
+                  type="password"
+                  placeholder="Ulangi password"
+                  className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setStep('email')} className="flex-1 py-2 rounded-full font-semibold text-[#008207] border border-[#008207] hover:bg-[#008207] hover:text-white transition-colors">
+                  Kembali
+                </button>
+                <button type="submit" disabled={loading} className={`flex-1 py-2 rounded-full font-semibold text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}>
+                  {loading ? 'Menyimpan...' : 'Reset Password'}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
-
-        <h1 className="text-3xl font-bold mb-4 text-[#004203] max-w-[400px]">
-          {step === 'email' ? 'Reset Password' : 'Atur Ulang Password'}
-        </h1>
-
-        <p className="text-[#878787] mb-6 text-sm max-w-[400px]">
-          {step === 'email'
-            ? 'Masukkan email Anda untuk menerima kode OTP.'
-            : `Masukkan kode OTP yang dikirim ke ${email} dan password baru Anda.`}
-        </p>
-
-        {error && <div className="mb-4 text-red-600">{error}</div>}
-
-        {step === 'email' ? (
-          // Form: Masukkan Email
-          <form onSubmit={handleSendOTP} className="w-80">
-            <div className="mb-6">
-              <h3 className="font-medium">Email</h3>
-              <input
-                type="email"
-                placeholder="name@example.com"
-                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full py-2 rounded-full font-semibold text-white ${
-                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'
-              } transition-colors`}
-            >
-              {loading ? 'Mengirim...' : 'Kirim OTP'}
-            </button>
-          </form>
-        ) : (
-          // Form: OTP + Password Baru
-          <form onSubmit={handleResetPassword} className="w-80">
-            <div className="mb-4">
-              <h3 className="font-medium">Kode OTP</h3>
-              <input
-                type="text"
-                inputMode="numeric"
-                placeholder="123456"
-                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                required
-                maxLength={6}
-              />
-            </div>
-            <div className="mb-4">
-              <h3 className="font-medium">Password Baru</h3>
-              <input
-                type="password"
-                placeholder="Password baru"
-                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-6">
-              <h3 className="font-medium">Konfirmasi Password</h3>
-              <input
-                type="password"
-                placeholder="Ulangi password"
-                className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setStep('email')}
-                className="flex-1 py-2 rounded-full font-semibold text-[#008207] border border-[#008207] hover:bg-[#008207] hover:text-white transition-colors"
-              >
-                Kembali
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`flex-1 py-2 rounded-full font-semibold text-white ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'
-                } transition-colors`}
-              >
-                {loading ? 'Menyimpan...' : 'Reset Password'}
-              </button>
-            </div>
-          </form>
-        )}
+        <img className="hidden lg:block relative -right-25" src={ilustrasiReset} alt="Ilustrasi Reset Password" />
       </div>
     </div>
   );
