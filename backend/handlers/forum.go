@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"log"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -149,6 +151,18 @@ func TambahKomentarForum(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validasi apakah forum_id ada di database
+	var exists bool
+	err = config.DB.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM forum WHERE id=$1)", forumID).Scan(&exists)
+	if err != nil || !exists {
+		writeJSONError(w, http.StatusNotFound, "forum_id tidak ditemukan")
+		return
+	}
+
+	// Logging tambahan untuk debugging
+	log.Printf("Memeriksa forum_id: %d", forumID)
+	log.Printf("Hasil validasi forum_id: %v", exists)
+
 	var req struct {
 		Isi string `json:"isi"`
 	}
@@ -194,7 +208,9 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	var req struct{ ID int `json:"id"` }
+	var req struct {
+		ID int `json:"id"`
+	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Request tidak valid", http.StatusBadRequest)
 		return
@@ -214,32 +230,34 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"message": "Gagal menghapus user: "+err.Error()})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Gagal menghapus user: " + err.Error()})
 		return
 	}
 	json.NewEncoder(w).Encode(map[string]string{"message": "User berhasil dihapus"})
 }
 
 func DeleteForum(w http.ResponseWriter, r *http.Request) {
-    enableCORS(w)
-    if r.Method == "OPTIONS" {
-        w.WriteHeader(http.StatusOK)
-        return
-    }
-    if r.Method != "POST" {
-        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-        return
-    }
-    var req struct{ ID int `json:"id"` }
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        http.Error(w, "Request tidak valid", http.StatusBadRequest)
-        return
-    }
-    _, _ = config.DB.Exec(context.Background(), "DELETE FROM forum_comment WHERE forum_id=$1", req.ID)
-    _, err := config.DB.Exec(context.Background(), "DELETE FROM forum WHERE id=$1", req.ID)
-    if err != nil {
-        http.Error(w, "Gagal menghapus forum", http.StatusInternalServerError)
-        return
-    }
-    json.NewEncoder(w).Encode(map[string]string{"message": "Forum berhasil dihapus"})
+	enableCORS(w)
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		ID int `json:"id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Request tidak valid", http.StatusBadRequest)
+		return
+	}
+	_, _ = config.DB.Exec(context.Background(), "DELETE FROM forum_comment WHERE forum_id=$1", req.ID)
+	_, err := config.DB.Exec(context.Background(), "DELETE FROM forum WHERE id=$1", req.ID)
+	if err != nil {
+		http.Error(w, "Gagal menghapus forum", http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(map[string]string{"message": "Forum berhasil dihapus"})
 }
