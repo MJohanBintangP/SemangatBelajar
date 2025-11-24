@@ -131,70 +131,57 @@ export default function Tantangan() {
   }
 
   async function handleUpload(tantangan: Tantangan) {
-    if (!isAdmin) {
-      alert('Hanya admin yang dapat menandai tantangan selesai.');
-      return;
-    }
-
-    if (completed.includes(tantangan.id)) {
-      return;
-    }
-
-    const file = files[tantangan.id];
-    if (!file) {
-      alert('Silakan pilih foto terlebih dahulu!');
-      return;
-    }
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Anda harus login terlebih dahulu!');
-      return;
-    }
-
-    setUploadingId(tantangan.id);
-
-    const formData = new FormData();
-    formData.append('tantangan_id', tantangan.id.toString());
-    formData.append('poin', tantangan.poin.toString());
-    formData.append('foto', file);
-
-    try {
-      const res = await fetch('http://localhost:8081/api/tantangan/selesai', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || 'Upload gagal');
-      }
-
-      await res.json();
-      
-      setCompleted((prev) => [...prev, tantangan.id]);
-      setTotalPoin((prev) => prev + tantangan.poin);
-
-      if (previews[tantangan.id]) {
-        try {
-          URL.revokeObjectURL(previews[tantangan.id]);
-        } catch {}
-      }
-      
-      setFiles((prev) => ({ ...prev, [tantangan.id]: null }));
-      setPreviews((p) => ({ ...p, [tantangan.id]: '' }));
-
-      alert('Tantangan berhasil diselesaikan!');
-    } catch (err) {
-      console.error(err);
-      alert('Gagal mengupload foto. Silakan coba lagi.');
-    } finally {
-      setUploadingId(null);
-    }
+  if (completed.includes(tantangan.id)) {
+    return;
   }
+
+  const file = files[tantangan.id];
+  if (!file) {
+    alert('Silakan pilih foto terlebih dahulu!');
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Anda harus login terlebih dahulu!');
+    return;
+  }
+
+  setUploadingId(tantangan.id);
+
+  const formData = new FormData();
+  formData.append('tantangan_id', tantangan.id.toString());
+  formData.append('foto', file);
+
+  try {
+    const res = await fetch('http://localhost:8081/api/tantangan/selesai', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText || 'Upload gagal');
+    }
+
+    await res.json();
+
+    // Jangan langsung set completed dan tambah poin!
+    // Tampilkan status menunggu persetujuan admin
+    alert('Foto berhasil diupload! Menunggu persetujuan admin.');
+
+    setFiles((prev) => ({ ...prev, [tantangan.id]: null }));
+    setPreviews((p) => ({ ...p, [tantangan.id]: '' }));
+  } catch (err) {
+    console.error(err);
+    alert('Gagal mengupload foto. Silakan coba lagi.');
+  } finally {
+    setUploadingId(null);
+  }
+}
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -292,7 +279,7 @@ export default function Tantangan() {
                           type="file"
                           accept="image/*"
                           onChange={(e) => handleFileChange(e, t.id)}
-                          disabled={!isAdmin || completed.includes(t.id)}
+                          disabled={completed.includes(t.id)}
                           className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         
@@ -309,7 +296,7 @@ export default function Tantangan() {
                         {files[t.id] && (
                           <button
                             onClick={() => handleUpload(t)}
-                            disabled={!isAdmin || uploadingId === t.id}
+                            disabled={uploadingId === t.id}
                             className="mt-3 bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition"
                           >
                             {uploadingId === t.id ? 'Mengupload...' : 'Upload & Selesai'}

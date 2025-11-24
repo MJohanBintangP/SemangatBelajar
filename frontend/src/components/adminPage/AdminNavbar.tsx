@@ -65,6 +65,10 @@ export default function AdminNavbar({ activeTab, setActiveTab }: AdminNavbarProp
         <button onClick={() => setActiveTab('forums')} className={`cursor-pointer flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${activeTab === 'forums' ? 'bg-green-100' : 'hover:bg-green-100'}`}>
           <Phospor.ChatCircleTextIcon size={20} weight="bold" /> Data Forum
         </button>
+
+        <button onClick={() => setActiveTab('tantangan')} className={`cursor-pointer flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${activeTab === 'tantangan' ? 'bg-green-100' : 'hover:bg-green-100'}`}>
+          <Phospor.ImageIcon size={20} weight="bold" /> Data Tantangan
+        </button>
       </nav>
 
       {/* Logout Button */}
