@@ -4,6 +4,8 @@ import (
 	"backend/config"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"math/rand"
 	"net/http"
 	"os"
@@ -233,13 +235,13 @@ func GetLeaderboard(w http.ResponseWriter, r *http.Request) {
 }
 
 func SelesaiTantanganHandler(w http.ResponseWriter, r *http.Request) {
-	// Pastikan method POST
+	enableCORS(w)
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Ambil user_id dari JWT
+	// Auth: ambil user_id dari JWT
 	authHeader := r.Header.Get("Authorization")
 	if !strings.HasPrefix(authHeader, "Bearer ") {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -254,59 +256,84 @@ func SelesaiTantanganHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	userID := int(claims["user_id"].(float64))
+	uidFloat, ok := claims["user_id"].(float64)
+	if !ok {
+		http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+		return
+	}
+	userID := int(uidFloat)
 
-	// Parse multipart form
-	err := r.ParseMultipartForm(10 << 20) // max 10MB
-	if err != nil {
-		http.Error(w, "Gagal parsing form", http.StatusBadRequest)
+	// Parse multipart form (maks 10MB)
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		http.Error(w, "Gagal memproses form: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	// Ambil tantangan_id
 	tantanganIDStr := r.FormValue("tantangan_id")
-
+	if tantanganIDStr == "" {
+		http.Error(w, "Field tantangan_id wajib", http.StatusBadRequest)
+		return
+	}
 	tantanganID, err := strconv.Atoi(tantanganIDStr)
 	if err != nil {
-		http.Error(w, "ID tantangan tidak valid", http.StatusBadRequest)
+		http.Error(w, "tantangan_id tidak valid", http.StatusBadRequest)
 		return
 	}
 
 	// Ambil file foto
-	file, handler, err := r.FormFile("foto")
+	file, header, err := r.FormFile("foto")
 	if err != nil {
-		http.Error(w, "Foto tidak ditemukan", http.StatusBadRequest)
+		http.Error(w, "Foto wajib diunggah", http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
 
-	// Simpan file ke folder tmp/
-	filename := strconv.Itoa(tantanganID) + "_" + strconv.FormatInt(time.Now().Unix(), 10) + filepath.Ext(handler.Filename)
-	savePath := filepath.Join("tmp", filename)
-	dst, err := os.Create(savePath)
+	// Validasi sederhana tipe file berdasarkan ekstensi
+	ext := strings.ToLower(filepath.Ext(header.Filename))
+	if ext == "" {
+		ext = ".jpg"
+	}
+	allowed := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true}
+	if !allowed[ext] {
+		http.Error(w, "Tipe file tidak diperbolehkan", http.StatusBadRequest)
+		return
+	}
+
+	// Simpan file ke tmp/uploads dengan nama unik
+	saveDir := "tmp/uploads"
+	if err := os.MkdirAll(saveDir, 0755); err != nil {
+		http.Error(w, "Gagal membuat folder penyimpanan", http.StatusInternalServerError)
+		return
+	}
+	filename := fmt.Sprintf("user%d_%d_%d%s", userID, time.Now().UnixNano(), rand.Intn(10000), ext)
+	dstPath := filepath.Join(saveDir, filename)
+	dst, err := os.Create(dstPath)
 	if err != nil {
-		http.Error(w, "Gagal menyimpan foto", http.StatusInternalServerError)
+		http.Error(w, "Gagal menyimpan file", http.StatusInternalServerError)
 		return
 	}
 	defer dst.Close()
-	_, err = dst.ReadFrom(file)
-	if err != nil {
-		http.Error(w, "Gagal menyimpan foto", http.StatusInternalServerError)
+	if _, err := io.Copy(dst, file); err != nil {
+		http.Error(w, "Gagal menulis file", http.StatusInternalServerError)
 		return
 	}
 
-	// Update status tantangan selesai di database dan tambah poin user
-	var count int
-	err = config.DB.QueryRow(context.Background(),
-		"SELECT COUNT(*) FROM tantangan_user WHERE user_id=$1 AND tantangan_id=$2", userID, tantanganID).Scan(&count)
-	if err == nil && count == 0 {
-		config.DB.Exec(context.Background(),
-			"INSERT INTO tantangan_user (user_id, tantangan_id, status, waktu_selesai, foto_path) VALUES ($1, $2, 'pending', NULL, $3)",
-			userID, tantanganID, filename)
-		// Jangan update poin di sini!
+	// Simpan path relatif ke DB (tanpa leading "tmp/") sehingga frontend bisa akses /tmp/<db_path>
+	dbPath := filepath.ToSlash(filepath.Join("uploads", filename))
+
+	// Masukkan record ke tabel tantangan_user dengan status 'pending'
+	_, err = config.DB.Exec(context.Background(),
+		"INSERT INTO tantangan_user (user_id, tantangan_id, status, foto_path, waktu_selesai) VALUES ($1, $2, $3, $4, $5)",
+		userID, tantanganID, "pending", dbPath, nil)
+	if err != nil {
+		http.Error(w, "Gagal menyimpan data tantangan: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"success":true,"message":"Tantangan selesai dan foto berhasil diupload"}`))
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Upload berhasil, menunggu persetujuan admin"})
 }
 
 func GetPendingTantanganUser(w http.ResponseWriter, r *http.Request) {
@@ -348,4 +375,170 @@ func GetPendingTantanganUser(w http.ResponseWriter, r *http.Request) {
     }
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(result)
+}
+
+// Approve tantangan user (admin)
+func ApproveTantangan(w http.ResponseWriter, r *http.Request) {
+    enableCORS(w)
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    authHeader := r.Header.Get("Authorization")
+    if !strings.HasPrefix(authHeader, "Bearer ") {
+        writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
+        return
+    }
+    tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+    token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+        return jwtKey, nil
+    })
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
+        return
+    }
+    // Cek role (harus admin)
+    if roleVal, exists := claims["role"]; !exists || roleVal != "admin" {
+        writeJSONError(w, http.StatusForbidden, "Forbidden")
+        return
+    }
+
+    var req struct {
+        TantanganUserID int `json:"tantangan_user_id"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        writeJSONError(w, http.StatusBadRequest, "Request tidak valid")
+        return
+    }
+
+    // Ambil user_id dan tantangan_id dari record
+    var userID, tantanganID int
+    err := config.DB.QueryRow(context.Background(), "SELECT user_id, tantangan_id FROM tantangan_user WHERE id=$1", req.TantanganUserID).Scan(&userID, &tantanganID)
+    if err != nil {
+        writeJSONError(w, http.StatusNotFound, "Tantangan user tidak ditemukan")
+        return
+    }
+
+    // Ambil poin tantangan
+    var poin int
+    if err := config.DB.QueryRow(context.Background(), "SELECT poin FROM tantangan WHERE id=$1", tantanganID).Scan(&poin); err != nil {
+        poin = 0
+    }
+
+    // Update status dan waktu_selesai
+    if _, err := config.DB.Exec(context.Background(), "UPDATE tantangan_user SET status='selesai', waktu_selesai=NOW() WHERE id=$1", req.TantanganUserID); err != nil {
+        writeJSONError(w, http.StatusInternalServerError, "Gagal update status tantangan")
+        return
+    }
+
+    // Tambahkan poin ke user
+    if _, err := config.DB.Exec(context.Background(), "UPDATE users SET poin = poin + $1 WHERE id=$2", poin, userID); err != nil {
+        writeJSONError(w, http.StatusInternalServerError, "Gagal menambahkan poin user")
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{"message": "Tantangan berhasil diapprove"})
+}
+
+// Reject tantangan user (admin)
+func RejectTantangan(w http.ResponseWriter, r *http.Request) {
+    enableCORS(w)
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    authHeader := r.Header.Get("Authorization")
+    if !strings.HasPrefix(authHeader, "Bearer ") {
+        writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
+        return
+    }
+    tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+    token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+        return jwtKey, nil
+    })
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        writeJSONError(w, http.StatusUnauthorized, "Unauthorized")
+        return
+    }
+    if roleVal, exists := claims["role"]; !exists || roleVal != "admin" {
+        writeJSONError(w, http.StatusForbidden, "Forbidden")
+        return
+    }
+
+    var req struct {
+        TantanganUserID int `json:"tantangan_user_id"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        writeJSONError(w, http.StatusBadRequest, "Request tidak valid")
+        return
+    }
+
+    // Set status rejected
+    if _, err := config.DB.Exec(context.Background(), "UPDATE tantangan_user SET status='rejected' WHERE id=$1", req.TantanganUserID); err != nil {
+        writeJSONError(w, http.StatusInternalServerError, "Gagal update status tantangan")
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{"message": "Tantangan berhasil direject"})
+}
+
+func GetUserTantanganSubmissions(w http.ResponseWriter, r *http.Request) {
+    enableCORS(w)
+    if r.Method != http.MethodGet {
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    authHeader := r.Header.Get("Authorization")
+    if !strings.HasPrefix(authHeader, "Bearer ") {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+    tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+    token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+        return jwtKey, nil
+    })
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+    uidFloat, ok := claims["user_id"].(float64)
+    if !ok {
+        http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+        return
+    }
+    userID := int(uidFloat)
+
+    // Query dengan context
+    rows, err := config.DB.Query(context.Background(),
+        "SELECT tantangan_id, status, foto_path FROM tantangan_user WHERE user_id = $1", userID)
+    if err != nil {
+        http.Error(w, "DB error", http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
+
+    type Submission struct {
+        TantanganID int    `json:"tantangan_id"`
+        Status      string `json:"status"`
+        FotoPath    string `json:"foto_path"`
+    }
+
+    var submissions []Submission
+    for rows.Next() {
+        var s Submission
+        if err := rows.Scan(&s.TantanganID, &s.Status, &s.FotoPath); err == nil {
+            submissions = append(submissions, s)
+        }
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(submissions)
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useToast } from '../../toast/toast';
 
 export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
   const [judul, setJudul] = useState('');
@@ -7,6 +8,7 @@ export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
   const [videoUrl, setVideoUrl] = useState('');
   const [lokasi, setLokasi] = useState('');
   const [pesan, setPesan] = useState('');
+  const { showToast } = useToast(); // Tambahkan ini
 
   function getLocation() {
     if (!navigator.geolocation) {
@@ -47,9 +49,11 @@ export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
       const data = await res.json();
       if (!res.ok) {
         setPesan(data.message || 'Gagal mengirim laporan');
+        showToast(data.message || 'Gagal mengirim laporan', 'error');
         return;
       }
       setPesan('Laporan berhasil dikirim!');
+      showToast('Laporan berhasil dikirim!', 'success');
       setJudul('');
       setDeskripsi('');
       setFotoUrl('');
@@ -58,45 +62,64 @@ export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
       if (onClose) onClose();
     } catch {
       setPesan('Gagal koneksi ke server');
+      showToast('Gagal koneksi ke server', 'error');
     }
   }
 
+  function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('http://localhost:8081/api/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setFotoUrl(data.url);
+      })
+      .catch(() => setPesan('Gagal upload gambar'));
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-8 w-full max-w-md">
-        <h2 className="text-xl font-bold mb-6">Tambah laporan</h2>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-2 sm:px-6">
+      <div className="bg-white rounded-xl p-4 sm:p-8 w-full max-w-xs sm:max-w-md">
+        <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Tambah laporan</h2>
 
-        {pesan && <div className="mb-4 text-red-600">{pesan}</div>}
+        {pesan && <div className="mb-4 text-red-600 text-sm">{pesan}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <input className="w-full p-3 border border-gray-200 rounded-lg bg-white" value={judul} onChange={(e) => setJudul(e.target.value)} placeholder="Judul" required />
+            <input className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={judul} onChange={(e) => setJudul(e.target.value)} placeholder="Judul" required />
           </div>
 
           <div>
-            <textarea className="w-full p-3 border border-gray-200 rounded-lg bg-white min-h-[120px]" value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} placeholder="Deskripsi" required />
+            <textarea className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white min-h-[80px] sm:min-h-[120px] text-sm" value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} placeholder="Deskripsi" required />
           </div>
 
           <div>
-            <input className="w-full p-3 border border-gray-200 rounded-lg bg-white" value={fotoUrl} onChange={(e) => setFotoUrl(e.target.value)} placeholder="Url foto" />
+            <input type="file" accept="image/*" className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" onChange={handleFotoChange} />
+            {fotoUrl && fotoUrl !== '' && <img src={fotoUrl} alt="Preview" className="mt-2 max-h-32 sm:max-h-40 rounded" />}
           </div>
 
           <div>
-            <input className="w-full p-3 border border-gray-200 rounded-lg bg-white" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="Url video" />
+            <input className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="Url video" />
           </div>
 
-          <div className="flex gap-2 mb-12">
-            <input className="flex-1 p-3 border border-gray-200 rounded-lg bg-white" value={lokasi} readOnly placeholder="Koordinat" />
-            <button type="button" onClick={getLocation} className="px-4 py-2 bg-[#25E82F] text-white rounded-lg font-medium">
+          <div className="flex gap-2 mb-8 sm:mb-12 flex-col sm:flex-row">
+            <input className="flex-1 p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={lokasi} readOnly placeholder="Koordinat" />
+            <button type="button" onClick={getLocation} className="px-4 py-2 bg-[#25E82F] text-white rounded-lg font-medium text-sm">
               Ambil lokasi
             </button>
           </div>
 
           <div className="flex gap-3 justify-end mb-0">
-            <button type="button" onClick={handleCancel} className="cursor-pointer px-6 py-2 border border-gray-200 rounded-lg">
+            <button type="button" onClick={handleCancel} className="cursor-pointer px-4 sm:px-6 py-2 border border-gray-200 rounded-lg text-sm">
               Batal
             </button>
-            <button type="submit" className="cursor-pointer bg-[#25E82F] text-white px-4 py-2 rounded-lg font-medium">
+            <button type="submit" className="cursor-pointer bg-[#25E82F] text-white px-4 py-2 rounded-lg font-medium text-sm">
               Tambah laporan
             </button>
           </div>

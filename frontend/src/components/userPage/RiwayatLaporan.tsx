@@ -33,6 +33,8 @@ export default function RiwayatLaporan() {
       });
   }, []);
 
+  console.log('API BASE URL:', import.meta.env.VITE_API_BASE_URL);
+
   return (
     <div className="my-4">
       <div className="bg-white px-10 py-6 rounded-[15px] shadow-md">
@@ -49,7 +51,7 @@ export default function RiwayatLaporan() {
                 <div className="text-sm text-[#818181] mb-2">{l.deskripsi}</div>
                 <div className="flex gap-4 mb-2 font-medium">
                   {l.foto_url && (
-                    <a href={l.foto_url} target="_blank" rel="noopener noreferrer" className="block text-[#005EFF] text-sm">
+                    <a href={l.foto_url.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'}${l.foto_url}` : l.foto_url} target="_blank" rel="noopener noreferrer" className="block text-[#005EFF] text-sm">
                       Lihat Foto
                     </a>
                   )}
@@ -61,7 +63,25 @@ export default function RiwayatLaporan() {
                 </div>
 
                 <div className="flex text-sm text-gray-500 mb-2">
-                  <span className="font-medium text-black">Lokasi:</span> {l.lokasi}
+                  <span className="font-medium text-black">Lokasi:</span>
+                  {l.lokasi ? (
+                    <button
+                      type="button"
+                      className="ml-1 underline text-blue-600"
+                      style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+                      onClick={() => {
+                        // Pastikan format koordinat benar (lat,long)
+                        const [lat, lng] = l.lokasi.split(',');
+                        if (lat && lng) {
+                          window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+                        }
+                      }}
+                    >
+                      {l.lokasi}
+                    </button>
+                  ) : (
+                    <span className="ml-1">-</span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <div className="flex text-sm font-medium">Status: {l.status}</div>

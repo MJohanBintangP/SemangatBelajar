@@ -67,11 +67,11 @@ export default function ArtikelGrid({ limit = 8, isDashboard = false }: ArtikelG
   if (loading) return <div>Memuat artikel...</div>;
   if (articles.length === 0) return <div className="text-gray-500">Tidak ada artikel lingkungan ditemukan.</div>;
 
-  const containerClasses = isDashboard ? '' : 'py-10';
+  const containerClasses = isDashboard ? '' : 'py-0 md:py-10 px-4';
 
   return (
     <div className={containerClasses}>
-      {!isDashboard && isArtikelPage && <h1 className="text-2xl font-bold mb-8">Artikel</h1>}
+      {!isDashboard && isArtikelPage && <h1 className="text-2xl font-bold mb-4 md:mb-8">Artikel</h1>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {articles.map((a, idx) => (
