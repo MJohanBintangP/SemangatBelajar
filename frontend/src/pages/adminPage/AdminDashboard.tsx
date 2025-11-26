@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../../components/adminPage/AdminNavbar';
+import { useToast } from '../../toast/toast'; // <-- Tambahkan ini
+import ConfirmOverlay from '../../toast/ConfirmOverlay';
+import { X, XIcon } from '@phosphor-icons/react';
 
 type Laporan = {
   id: number;
@@ -49,6 +52,15 @@ type TantanganUser = {
 };
 
 export default function AdminDashboard() {
+  // ...existing state...
+  const { showToast } = useToast(); // <-- Tambahkan ini
+
+  // Tambahkan state untuk overlay konfirmasi
+  const [confirmAction, setConfirmAction] = useState<null | {
+    message: string;
+    onConfirm: () => void;
+  }>(null);
+
   // Fungsi hapus user
   async function handleDeleteUser(id: number) {
     setPesan('');
@@ -65,9 +77,11 @@ export default function AdminDashboard() {
     if (!res.ok) {
       const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal hapus user';
       setPesan(msg);
+      showToast(msg, 'error'); // <-- Tambahkan ini
       return;
     }
     setPesan('User berhasil dihapus');
+    showToast('User berhasil dihapus', 'success'); // <-- Tambahkan ini
     fetchAllData();
   }
 
@@ -87,9 +101,11 @@ export default function AdminDashboard() {
     if (!res.ok) {
       const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal hapus forum';
       setPesan(msg);
+      showToast(msg, 'error'); // <-- Tambahkan ini
       return;
     }
     setPesan('Forum berhasil dihapus');
+    showToast('Forum berhasil dihapus', 'success'); // <-- Tambahkan ini
     fetchAllData();
   }
 
@@ -109,9 +125,11 @@ export default function AdminDashboard() {
     if (!res.ok) {
       const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal hapus laporan';
       setPesan(msg);
+      showToast(msg, 'error'); // <-- Tambahkan ini
       return;
     }
     setPesan('Laporan berhasil dihapus');
+    showToast('Laporan berhasil dihapus', 'success'); // <-- Tambahkan ini
     fetchAllData();
   }
   const [laporan, setLaporan] = useState<Laporan[]>([]);
@@ -247,9 +265,11 @@ export default function AdminDashboard() {
     if (!res.ok) {
       const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal update status';
       setPesan(msg);
+      showToast(msg, 'error'); // <-- Tambahkan ini
       return;
     }
     setPesan('Status berhasil diupdate');
+    showToast('Status berhasil diupdate', 'success'); // <-- Tambahkan ini
     fetchAllData();
   }
 
@@ -268,9 +288,11 @@ export default function AdminDashboard() {
     if (!res.ok) {
       const msg = typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string' ? (data as { message: string }).message : typeof data === 'string' ? data : 'Gagal update user';
       setPesan(msg);
+      showToast(msg, 'error'); // <-- Tambahkan ini
       return;
     }
     setPesan('User berhasil diupdate');
+    showToast('User berhasil diupdate', 'success'); // <-- Tambahkan ini
     fetchAllData();
   }
 
@@ -328,7 +350,7 @@ export default function AdminDashboard() {
     }
   }
 
-  async function handleApproveTantangan(id: number, user_id: number, tantangan_id: number) {
+  async function handleApproveTantangan(id: number) {
     setPesan('');
     const token = localStorage.getItem('token');
     const res = await fetch(`${API_BASE_URL}/api/tantangan/approve`, {
@@ -342,9 +364,11 @@ export default function AdminDashboard() {
     const data = await parseResponse(res);
     if (!res.ok) {
       setPesan(typeof data === 'string' ? data : 'Gagal approve tantangan');
+      showToast(typeof data === 'string' ? data : 'Gagal approve tantangan', 'error'); // <-- Tambahkan ini
       return;
     }
     setPesan('Tantangan berhasil diapprove');
+    showToast('Tantangan berhasil diapprove', 'success'); // <-- Tambahkan ini
     fetchTantanganUser();
   }
 
@@ -362,101 +386,75 @@ export default function AdminDashboard() {
     const data = await parseResponse(res);
     if (!res.ok) {
       setPesan(typeof data === 'string' ? data : 'Gagal reject tantangan');
-      return;
+      showToast(typeof data === 'string' ? data : 'Gagal reject tantangan', 'error');
     }
     setPesan('Tantangan berhasil direject');
+    showToast('Tantangan berhasil direject', 'success');
     fetchTantanganUser();
   }
 
   return (
-    <div className="bg-white h-screen flex overflow-hidden">
-      <aside className="w-76 bg-white h-screen flex-shrink-0 shadow-lg">
-        <div className="h-full flex flex-col overflow-hidden">
-          <AdminNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
-        </div>
+    <div className="bg-white h-screen flex flex-col md:flex-row overflow-hidden">
+      {/* Navbar: tampil di semua device, atur tampilannya di dalam AdminNavbar */}
+      <AdminNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* Sidebar: hanya tampil di desktop/tablet */}
+      <aside className="hidden md:block bg-white h-screen flex-shrink-0 shadow-lg">
+        <div className="h-full flex flex-col overflow-hidden">{/* AdminNavbar sudah dipanggil di luar, tidak perlu di sini */}</div>
       </aside>
-      <main className="flex-1 overflow-y-auto px-10 py-5">
-        <div className="py-10">
-          <h2 className="text-22 font-bold mb-4">Dashboard Admin</h2>
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto px-4 md:px-10 py-5 pt-14 md:pt-10">
+        <div className="py-4 sm:py-8">
+          <h2 className="text-lg sm:text-2xl font-bold mb-2 md:mb-4">Dashboard Admin</h2>
           {pesan && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">{pesan}</div>}
 
+          {/* Overlay konfirmasi universal */}
+          {confirmAction && (
+            <ConfirmOverlay
+              message={confirmAction.message}
+              onConfirm={() => {
+                confirmAction.onConfirm();
+                setConfirmAction(null);
+              }}
+              onCancel={() => setConfirmAction(null)}
+            />
+          )}
+
+          {/* Contoh penggunaan pada hapus user */}
           {showDeleteUserOverlay && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-              <div className="bg-white p-6 rounded-2xl shadow-lg max-w-md w-full flex flex-col items-center">
-                <h3 className="text-lg font-bold mb-4 text-center">Konfirmasi Hapus User</h3>
-                <p className="mb-4 text-center">
-                  Yakin ingin menghapus user <span className="font-semibold">{showDeleteUserOverlay.username}</span>?<br />
-                  Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    className="bg-green-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
-                    onClick={async () => {
-                      await handleDeleteUser(showDeleteUserOverlay.id);
-                      setShowDeleteUserOverlay(null);
-                    }}
-                  >
-                    Yes
-                  </button>
-                  <button className="bg-red-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300" onClick={() => setShowDeleteUserOverlay(null)}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ConfirmOverlay
+              message={`Yakin ingin menghapus user ${showDeleteUserOverlay.username}? Tindakan ini tidak dapat dibatalkan.`}
+              onConfirm={async () => {
+                await handleDeleteUser(showDeleteUserOverlay.id);
+                setShowDeleteUserOverlay(null);
+              }}
+              onCancel={() => setShowDeleteUserOverlay(null)}
+            />
           )}
 
+          {/* Contoh penggunaan pada hapus forum */}
           {showDeleteForumOverlay && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-              <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full flex flex-col items-center">
-                <h3 className="text-lg font-bold mb-2 text-center">Konfirmasi Hapus Forum</h3>
-                <p className="mb-4 text-center">
-                  Yakin ingin menghapus forum <span className="font-semibold">{showDeleteForumOverlay.judul}</span>? <br />
-                  Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    className="bg-green-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
-                    onClick={async () => {
-                      await deleteForum(showDeleteForumOverlay.id);
-                      setShowDeleteForumOverlay(null);
-                    }}
-                  >
-                    Yes
-                  </button>
-                  <button className="bg-red-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300" onClick={() => setShowDeleteForumOverlay(null)}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ConfirmOverlay
+              message={`Yakin ingin menghapus forum ${showDeleteForumOverlay.judul}? Tindakan ini tidak dapat dibatalkan.`}
+              onConfirm={async () => {
+                await deleteForum(showDeleteForumOverlay.id);
+                setShowDeleteForumOverlay(null);
+              }}
+              onCancel={() => setShowDeleteForumOverlay(null)}
+            />
           )}
 
+          {/* Contoh penggunaan pada hapus laporan */}
           {showDeleteLaporanOverlay && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-              <div className="bg-white p-6 rounded-2xl shadow-lg max-w-md w-full flex flex-col items-center">
-                <h3 className="text-lg font-bold mb-4 text-center">Konfirmasi Hapus Laporan</h3>
-                <p className="mb-4 text-center">
-                  Yakin ingin menghapus laporan <span className="font-semibold">{showDeleteLaporanOverlay.judul}</span>?<br />
-                  Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    className="bg-green-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300"
-                    onClick={async () => {
-                      await deleteLaporan(showDeleteLaporanOverlay.id);
-                      setShowDeleteLaporanOverlay(null);
-                    }}
-                  >
-                    Yes
-                  </button>
-                  <button className="bg-red-600 text-white px-4 py-2 rounded-2xl border-2 border-gray-300" onClick={() => setShowDeleteLaporanOverlay(null)}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ConfirmOverlay
+              message={`Yakin ingin menghapus laporan ${showDeleteLaporanOverlay.judul}? Tindakan ini tidak dapat dibatalkan.`}
+              onConfirm={async () => {
+                await deleteLaporan(showDeleteLaporanOverlay.id);
+                setShowDeleteLaporanOverlay(null);
+              }}
+              onCancel={() => setShowDeleteLaporanOverlay(null)}
+            />
           )}
+
           {loading ? (
             <div className="text-center text-gray-500 py-8">Memuat data...</div>
           ) : (
@@ -465,8 +463,8 @@ export default function AdminDashboard() {
               {activeTab === 'laporan' && (
                 <div>
                   <h3 className="text-2 font-semibold mb-4">Daftar Laporan</h3>
-                  <div className="overflow-x-auto rounded-lg shadow">
-                    <table className="min-w-full bg-white rounded-lg">
+                  <div className="overflow-x-auto rounded-lg shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">
                       <thead>
                         <tr>
                           <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-lg">ID</th>
@@ -493,7 +491,7 @@ export default function AdminDashboard() {
                                 <div className="text-xs text-gray-600">{l.deskripsi.substring(0, 50)}...</div>
                                 <div className="flex gap-2 mt-1">
                                   {l.foto_url && (
-                                    <a href={l.foto_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600">
+                                    <a href={l.foto_url.startsWith('/') ? `${API_BASE_URL}${l.foto_url}` : l.foto_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600">
                                       Lihat Foto
                                     </a>
                                   )}
@@ -503,7 +501,23 @@ export default function AdminDashboard() {
                                     </a>
                                   )}
                                 </div>
-                                <div className="text-xs text-gray-500 mt-1">{l.lokasi}</div>
+                                {l.lokasi && (
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    <button
+                                      type="button"
+                                      className="text-blue-600 underline"
+                                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                                      onClick={() => {
+                                        const [lat, lng] = l.lokasi.split(',');
+                                        if (lat && lng) {
+                                          window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+                                        }
+                                      }}
+                                    >
+                                      {l.lokasi}
+                                    </button>
+                                  </div>
+                                )}
                               </td>
                               <td className="px-4 py-3">
                                 <span
@@ -547,7 +561,7 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Daftar User</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
-                    <table className="min-w-full bg-white rounded-lg">
+                    <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">
                       <thead>
                         <tr>
                           <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-lg">ID</th>
@@ -577,22 +591,25 @@ export default function AdminDashboard() {
                               <td className="px-4 py-3">{u.poin}</td>
                               <td className="px-4 py-3">
                                 {showMiniTab === u.id ? (
-                                  <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+                                  <div className="fixed inset-0 flex px-6 md:px-0 items-center justify-center bg-black/50">
                                     <div className="bg-white p-6 rounded-2xl shadow-lg max-w-sm w-full">
-                                      <h3 className="text-lg font-bold mb-4">Edit User</h3>
+                                      <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-bold">Edit User</h3>
+                                        <button className="text-black" onClick={handleHideOverlay}>
+                                          <XIcon size={16} weight="bold" />
+                                        </button>
+                                      </div>
+
                                       <input type="text" className="border rounded px-2 py-1 text-sm mb-4 w-full" placeholder="Ganti Username" value={editUsername} onChange={(e) => setEditUsername(e.target.value)} />
                                       <select className="border rounded px-2 py-1 text-sm mb-4 w-full" value={editRole} onChange={(e) => setEditRole(e.target.value)}>
                                         <option value="user">user</option>
                                         <option value="admin">admin</option>
                                       </select>
-                                      <div className="flex justify-end gap-2">
-                                        <button className="W-Full bg-red-600 text-white px-4 py-2 rounded-2xl text-sm hover:bg-red-700 border-2 border-gray-300" onClick={() => setShowDeleteUserOverlay({ id: u.id, username: u.username })}>
+                                      <div className="flex justify-center gap-2">
+                                        <button className="w-full text-red-600 border-2 font-medium border-red-600 px-4 py-2 rounded-xl text-sm " onClick={() => setShowDeleteUserOverlay({ id: u.id, username: u.username })}>
                                           Hapus User
                                         </button>
-                                        <button className="W-Full bg-[#C4C7C1] text-black px-4 py-2 rounded-2xl text-sm hover:bg-gray-700 border-2 border-gray-300" onClick={handleHideOverlay}>
-                                          Batal
-                                        </button>
-                                        <button className="bg-[#32C439] text-white px-4 py-2 rounded-2xl text-sm hover:bg-green-700 border-2 border-gray-300" onClick={() => handleSaveEditUser(u.id)}>
+                                        <button className="w-full bg-[#32C439] text-white px-4 py-2 rounded-xl font-medium text-sm hover:bg-green-700 " onClick={() => handleSaveEditUser(u.id)}>
                                           Konfirmasi
                                         </button>
                                       </div>
@@ -618,7 +635,7 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="text-2 font-semibold mb-4">Daftar Forum</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
-                    <table className="min-w-full bg-white rounded-lg">
+                    <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">
                       <thead>
                         <tr>
                           <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-lg">ID</th>
@@ -707,8 +724,7 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         ))
-                      )
-                      }
+                      )}
                     </div>
                   </div>
 
@@ -737,7 +753,7 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="text-xl font-semibold mb-4">Approval Tantangan User</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
-                    <table className="min-w-full bg-white rounded-lg">
+                    <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">
                       <thead>
                         <tr>
                           <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-lg">ID</th>
@@ -775,7 +791,7 @@ export default function AdminDashboard() {
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex gap-2">
-                                  <button className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" onClick={() => handleApproveTantangan(t.id, t.user_id, t.tantangan_id)}>
+                                  <button className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" onClick={() => handleApproveTantangan(t.id)}>
                                     Approve
                                   </button>
                                   <button className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" onClick={() => handleRejectTantangan(t.id)}>

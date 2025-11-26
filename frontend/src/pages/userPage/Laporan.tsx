@@ -53,10 +53,10 @@ export default function Laporan() {
   }, [showPopup]);
 
   return (
-    <div className="py-10">
-      <h2 className="text-2xl font-bold mb-4">Laporan</h2>
-      <div className="flex flex-row justify-between items-center mb-12">
-        <div className="bg-[#25E82F]/9 flex px-10 py-3 rounded-xl gap-6">
+    <div className="py-0 md:py-8 px-2 sm:px-6 max-w-5xl mx-auto w-full">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4">Laporan</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4">
+        <div className="bg-[#25E82F]/9 flex flex-col sm:flex-row px-4 sm:px-10 py-3 rounded-xl gap-2 sm:gap-6 w-full sm:w-fit">
           <div>
             Total Laporan: <span className="font-bold">{totalLaporan}</span>
           </div>
@@ -64,43 +64,42 @@ export default function Laporan() {
             Status Terbaru: <span className="font-bold text-[#25E82F]">{statusTerbaru}</span>
           </div>
         </div>
-
-        <button onClick={() => setShowPopup(true)} className="cursor-pointer bg-white text-black px-6 py-3 rounded-xl font-semibold shadow-md flex items-center">
+        <button onClick={() => setShowPopup(true)} className="cursor-pointer bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold shadow-md flex items-center w-full sm:w-auto justify-center">
           + Tambah Laporan
         </button>
       </div>
-      <h1 className="mb-10 text-xl font-semibold">📌 Riwayat laporan</h1>
+      <h1 className="mb-6 sm:mb-10 text-lg sm:text-xl font-semibold">📌 Riwayat laporan</h1>
       {loading ? (
         <div className="text-gray-500">Memuat data...</div>
       ) : riwayat.length === 0 ? (
-        <div className="flex flex-col items-center justify-center  rounded-lg py-16">
-          <img src={ilustrasiEmpty} alt="Laporan kosong" className="w-80 mb-6" />
-          <div className="text-2xl font-bold mb-2">Laporan kosong</div>
-          <div className="text-gray-500 text-lg text-center">Buat laporan pertamamu terlebih dahulu !</div>
+        <div className="flex flex-col items-center justify-center rounded-lg py-12 sm:py-16">
+          <img src={ilustrasiEmpty} alt="Laporan kosong" className="w-60 sm:w-80 mb-6" />
+          <div className="text-xl sm:text-2xl font-bold mb-2">Laporan kosong</div>
+          <div className="text-gray-500 text-base sm:text-lg text-center">Buat laporan pertamamu terlebih dahulu !</div>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl shadow">
-          <table className="min-w-full bg-white rounded-2xl">
+          <table className="min-w-full bg-white rounded-2xl text-xs sm:text-sm">
             <thead>
               <tr>
-                <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tl-2xl">No</th>
-                <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Judul</th>
-                <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Deskripsi</th>
-                <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Dokumentasi</th>
-                <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Lokasi</th>
-                <th className="bg-[#25E82F] text-white px-4 py-2 text-left">Status</th>
-                <th className="bg-[#25E82F] text-white px-4 py-2 text-left rounded-tr-2xl">Tanggal melapor</th>
+                <th className="bg-[#25E82F] text-white px-2 sm:px-4 py-2 text-left rounded-tl-2xl">No</th>
+                <th className="bg-[#25E82F] text-white px-2 sm:px-4 py-2 text-left">Judul</th>
+                <th className="bg-[#25E82F] text-white px-2 sm:px-4 py-2 text-left">Deskripsi</th>
+                <th className="bg-[#25E82F] text-white px-2 sm:px-4 py-2 text-left">Dokumentasi</th>
+                <th className="bg-[#25E82F] text-white px-2 sm:px-4 py-2 text-left">Lokasi</th>
+                <th className="bg-[#25E82F] text-white px-2 sm:px-4 py-2 text-left">Status</th>
+                <th className="bg-[#25E82F] text-white px-2 sm:px-4 py-2 text-left rounded-tr-2xl">Tanggal melapor</th>
               </tr>
             </thead>
             <tbody>
               {riwayat.map((laporan, idx) => (
                 <tr key={laporan.id} className="">
-                  <td className="px-4 py-3 font-medium">{idx + 1}</td>
-                  <td className="px-4 py-3 font-semibold">{laporan.judul}</td>
-                  <td className="px-4 py-3 max-w-[250px]">{laporan.deskripsi}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-2 sm:px-4 py-3 font-medium">{idx + 1}</td>
+                  <td className="px-2 sm:px-4 py-3 font-semibold">{laporan.judul}</td>
+                  <td className="px-2 sm:px-4 py-3 max-w-[120px] sm:max-w-[250px] truncate">{laporan.deskripsi}</td>
+                  <td className="px-2 sm:px-4 py-3">
                     {laporan.foto_url && (
-                      <a href={laporan.foto_url} target="_blank" rel="noopener noreferrer" className="text-[#005EFF] block">
+                      <a href={laporan.foto_url.startsWith('/') ? `${API_BASE_URL}${laporan.foto_url}` : laporan.foto_url} target="_blank" rel="noopener noreferrer" className="text-[#005EFF] block">
                         Lihat foto
                       </a>
                     )}
@@ -110,9 +109,27 @@ export default function Laporan() {
                       </a>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[#005EFF]">{laporan.lokasi ? <span>{laporan.lokasi.length > 10 ? laporan.lokasi.substring(0, 8) + '...' : laporan.lokasi}</span> : '-'}</td>
-                  <td className="px-4 py-3 font-semibold">{laporan.status}</td>
-                  <td className="px-4 py-3 text-sm text-black">{new Date(laporan.created_at).toLocaleString()}</td>
+                  <td className="px-2 sm:px-4 py-3 text-[#005EFF]">
+                    {laporan.lokasi ? (
+                      <button
+                        type="button"
+                        className="underline"
+                        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+                        onClick={() => {
+                          const [lat, lng] = laporan.lokasi!.split(',');
+                          if (lat && lng) {
+                            window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+                          }
+                        }}
+                      >
+                        {laporan.lokasi && laporan.lokasi.length > 10 ? laporan.lokasi.substring(0, 8) + '...' : laporan.lokasi}
+                      </button>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
+                  <td className="px-2 sm:px-4 py-3 font-semibold">{laporan.status}</td>
+                  <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-black">{new Date(laporan.created_at).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

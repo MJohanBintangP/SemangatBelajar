@@ -4,8 +4,12 @@ import (
 	"backend/config"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -233,6 +237,47 @@ func GetUserLaporan(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(laporanList)
+}
+
+func UploadFotoHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "Gagal membaca file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	// Pastikan folder uploads sudah ada
+	uploadDir := "tmp/uploads"
+	os.MkdirAll(uploadDir, os.ModePerm)
+
+	// Buat nama file unik
+	filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), header.Filename)
+	filepath := filepath.Join(uploadDir, filename)
+
+	out, err := os.Create(filepath)
+	if err != nil {
+		http.Error(w, "Gagal menyimpan file", http.StatusInternalServerError)
+		return
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		http.Error(w, "Gagal menyimpan file", http.StatusInternalServerError)
+		return
+	}
+
+	// URL file yang bisa diakses frontend
+	url := "/tmp/uploads/" + filename
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"url": url})
 }
 
 func enableCORS(w http.ResponseWriter) {
