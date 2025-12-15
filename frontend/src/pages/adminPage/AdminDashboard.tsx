@@ -33,7 +33,7 @@ type Forum = {
 };
 
 // Tipe untuk pesan/komentar forum
-type ForumMessage = {
+ type ForumMessage = {
   id: number;
   user: string;
   isi: string;
@@ -140,6 +140,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('laporan');
   const [role, setRole] = useState<string>('');
+  const [detail, setDetail] = useState(false);
+  const [selectedLaporan, setSelectedLaporan] = useState<Laporan | null>(null);
 
   const [editUsername, setEditUsername] = useState('');
   const [editRole, setEditRole] = useState('user');
@@ -475,7 +477,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {laporan.length === 0 ? (
+                          {laporan.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="text-center text-gray-500 py-4">
                               Belum ada laporan.
@@ -483,7 +485,7 @@ export default function AdminDashboard() {
                           </tr>
                         ) : (
                           laporan.map((l) => (
-                            <tr key={l.id} className="border-t hover:bg-gray-50">
+                            <tr key={l.id} onClick={() => { setSelectedLaporan(l); setDetail(true); }} className="border-t hover:bg-gray-50 cursor-pointer">
                               <td className="px-4 py-3">{l.id}</td>
                               <td className="px-4 py-3">{l.user_id}</td>
                               <td className="px-4 py-3">
@@ -530,19 +532,19 @@ export default function AdminDashboard() {
                                 <div className="flex gap-2">
                                   <button
                                     className={`bg-yellow-500 text-white px-2 py-1 rounded text-xs ${l.status === 'Diproses' || l.status === 'Selesai' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-yellow-600'}`}
-                                    onClick={() => updateStatus(l.id, 'Diproses')}
+                                    onClick={(e) => { e.stopPropagation(); updateStatus(l.id, 'Diproses'); }}
                                     disabled={l.status === 'Diproses' || l.status === 'Selesai'}
                                   >
                                     Proses
                                   </button>
                                   <button
                                     className={`bg-green-600 text-white px-2 py-1 rounded text-xs ${l.status === 'Selesai' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-green-700'}`}
-                                    onClick={() => updateStatus(l.id, 'Selesai')}
+                                    onClick={(e) => { e.stopPropagation(); updateStatus(l.id, 'Selesai'); }}
                                     disabled={l.status === 'Selesai'}
                                   >
                                     Selesai
                                   </button>
-                                  <button className="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer hover:bg-red-700" onClick={() => setShowDeleteLaporanOverlay({ id: l.id, judul: l.judul })}>
+                                  <button className="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer hover:bg-red-700" onClick={(e) => { e.stopPropagation(); setShowDeleteLaporanOverlay({ id: l.id, judul: l.judul }); }}>
                                     Hapus
                                   </button>
                                 </div>
@@ -551,7 +553,44 @@ export default function AdminDashboard() {
                           ))
                         )}
                       </tbody>
+                      
                     </table>
+                    
+                  </div>
+                  
+                </div>
+                
+              )}
+
+              {detail && selectedLaporan && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50" onClick={() => { setDetail(false); setSelectedLaporan(null); }}>
+                  <div className="bg-white p-6 rounded-2xl shadow-lg max-w-2xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-bold">{selectedLaporan.judul}</h3>
+                      <button className="text-gray-500" onClick={() => { setDetail(false); setSelectedLaporan(null); }} aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            fillRule="evenodd"
+                            d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <p className="mt-2 text-gray-700 whitespace-pre-wrap">{selectedLaporan.deskripsi}</p>
+                    {selectedLaporan.foto_url && <img src={selectedLaporan.foto_url} alt="foto" className="mt-4 max-h-80 w-full object-contain rounded" />}
+                    {selectedLaporan.video_url && (
+                      <a href={selectedLaporan.video_url} target="_blank" rel="noreferrer" className="block text-blue-600 mt-2">
+                        Lihat Video
+                      </a>
+                    )}
+                    <div className="mt-4 text-sm text-gray-500">Lokasi: {selectedLaporan.lokasi}</div>
+                    <div className="mt-1 text-sm text-gray-500">Dibuat: {new Date(selectedLaporan.created_at).toLocaleString()}</div>
+                    <div className="mt-4 flex justify-end gap-2">
+                      <button className="bg-gray-200 px-4 py-2 rounded" onClick={() => { setDetail(false); setSelectedLaporan(null); }}>
+                        Tutup
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
