@@ -80,3 +80,5 @@ coverage.html
 *.local
 
 main.exe
+
+.env
