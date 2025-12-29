@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../../components/adminPage/AdminNavbar';
 import { useToast } from '../../toast/toast'; // <-- Tambahkan ini
 import ConfirmOverlay from '../../toast/ConfirmOverlay';
-import { X, XIcon } from '@phosphor-icons/react';
+import { XIcon } from '@phosphor-icons/react';
 
 type Laporan = {
   id: number;
