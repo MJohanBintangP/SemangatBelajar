@@ -123,10 +123,10 @@ export default function VerifyEmail() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-white">
+    <div id="page-verify-email" className="min-h-screen w-full flex items-center justify-center bg-white">
       <div className="flex justify-between items-center">
         <div className="flex flex-col px-20 lg:px-0">
-          <div onClick={() => navigate('/register')} className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer">
+          <div id="verify-back-register" onClick={() => navigate('/register')} className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer">
             <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
           </div>
 
@@ -138,10 +138,11 @@ export default function VerifyEmail() {
 
           {error && <div className="mb-4 text-red-600">{error}</div>}
 
-          <form onSubmit={handleVerify} className="w-80">
+          <form id="verify-email-form" onSubmit={handleVerify} className="w-80">
             <div className="mb-6">
               <h3 className="font-medium">Kode Verifikasi</h3>
               <input
+                id="verify-otp-input"
                 type="text"
                 inputMode="numeric"
                 placeholder="123456"
@@ -155,6 +156,7 @@ export default function VerifyEmail() {
             </div>
 
             <button
+              id="verify-email-submit"
               type="submit"
               disabled={loading || otp.length !== 6}
               className={`w-full py-2 rounded-full font-semibold text-white ${loading || otp.length !== 6 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}
@@ -164,7 +166,7 @@ export default function VerifyEmail() {
 
             <p className="text-center text-sm text-[#454545] mt-4">
               {canResend ? (
-                <button type="button" onClick={handleResendOTP} disabled={loading} className="text-[#008207] hover:underline disabled:text-gray-400">
+                <button id="verify-resend-otp" type="button" onClick={handleResendOTP} disabled={loading} className="text-[#008207] hover:underline disabled:text-gray-400">
                   Kirim ulang kode
                 </button>
               ) : (

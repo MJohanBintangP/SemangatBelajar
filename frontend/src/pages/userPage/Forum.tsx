@@ -98,28 +98,28 @@ export default function Forum() {
   }
 
   return (
-    <div className="py-0 md:py-8 px-2 sm:px-6 max-w-4xl mx-auto w-full">
+    <div id="page-forum" className="py-0 md:py-8 px-2 sm:px-6 max-w-4xl mx-auto w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <h1 className="text-xl sm:text-2xl font-bold">Forum</h1>
-        <button className="cursor-pointer bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold shadow-md flex items-center w-full sm:w-auto justify-center" onClick={() => setShowModal(true)}>
+        <button id="btn-open-forum-modal" className="cursor-pointer bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold shadow-md flex items-center w-full sm:w-auto justify-center" onClick={() => setShowModal(true)}>
           <span>+ Buat forum baru</span>
         </button>
       </div>
 
       {/* Tambah Forum */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-2 sm:px-0">
-          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg w-full max-w-xs sm:max-w-md">
+        <div id="forum-modal-overlay" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-2 sm:px-0">
+          <div id="forum-modal" className="bg-white p-4 sm:p-6 rounded-xl shadow-lg w-full max-w-xs sm:max-w-md">
             <h3 className="text-lg sm:text-xl font-bold mb-4">Buat Forum Baru</h3>
             {error && <div className="mb-2 text-red-600">{error}</div>}
-            <form onSubmit={handleSubmit}>
-              <input type="text" placeholder="Judul forum" className="w-full mb-3 p-2 sm:p-3 border border-gray-200 rounded-lg text-sm" value={judul} onChange={(e) => setJudul(e.target.value)} required />
-              <textarea placeholder="Isi forum" className="w-full mb-6 sm:mb-8 p-2 sm:p-3 border border-gray-200 rounded-lg min-h-[80px] sm:min-h-[120px] text-sm" value={isi} onChange={(e) => setIsi(e.target.value)} required />
+            <form id="forum-form" onSubmit={handleSubmit}>
+              <input id="forum-judul-input" type="text" placeholder="Judul forum" className="w-full mb-3 p-2 sm:p-3 border border-gray-200 rounded-lg text-sm" value={judul} onChange={(e) => setJudul(e.target.value)} required />
+              <textarea id="forum-isi-input" placeholder="Isi forum" className="w-full mb-6 sm:mb-8 p-2 sm:p-3 border border-gray-200 rounded-lg min-h-[80px] sm:min-h-[120px] text-sm" value={isi} onChange={(e) => setIsi(e.target.value)} required />
               <div className="flex gap-3 justify-end mb-2">
-                <button type="button" className="cursor-pointer px-4 sm:px-6 py-2 border border-gray-200 rounded-lg text-sm" onClick={() => setShowModal(false)}>
+                <button id="forum-modal-cancel" type="button" className="cursor-pointer px-4 sm:px-6 py-2 border border-gray-200 rounded-lg text-sm" onClick={() => setShowModal(false)}>
                   Batal
                 </button>
-                <button type="submit" className="bg-[#25E82F] cursor-pointer font-medium text-white px-4 py-2 rounded-lg text-sm">
+                <button id="forum-modal-submit" type="submit" className="bg-[#25E82F] cursor-pointer font-medium text-white px-4 py-2 rounded-lg text-sm">
                   Buat Forum
                 </button>
               </div>
@@ -128,7 +128,7 @@ export default function Forum() {
         </div>
       )}
 
-      <div className="space-y-6">
+      <div id="forum-post-list" className="space-y-6">
         {loading ? (
           <div className="text-center py-10 text-gray-500">Memuat data...</div>
         ) : posts.length === 0 ? (
@@ -139,7 +139,7 @@ export default function Forum() {
           </div>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="bg-white p-4 sm:p-8 rounded-2xl drop-shadow-lg">
+            <div id={`forum-card-${post.id}`} key={post.id} className="bg-white p-4 sm:p-8 rounded-2xl drop-shadow-lg">
               <h2 className="text-base sm:text-lg font-semibold mb-2">"{post.judul}"</h2>
               <p className="text-gray-700 mb-2 text-sm sm:text-base">{post.isi}</p>
               <p className="text-xs sm:text-sm text-gray-500 mb-4">
@@ -162,13 +162,14 @@ export default function Forum() {
 
                 <div className="flex mt-2 gap-3 sm:gap-6 flex-col sm:flex-row">
                   <input
+                    id={`forum-comment-input-${post.id}`}
                     type="text"
                     placeholder="Tulis komentar..."
                     className="flex-1 shadow-md rounded-lg p-2 text-xs sm:text-sm"
                     value={commentIsi[post.id] || ''}
                     onChange={(e) => setCommentIsi((prev) => ({ ...prev, [post.id]: e.target.value }))}
                   />
-                  <button className="bg-[#25E82F] cursor-pointer text-white px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm" onClick={() => handleComment(post.id)} disabled={!commentIsi[post.id]}>
+                  <button id={`forum-comment-submit-${post.id}`} className="bg-[#25E82F] cursor-pointer text-white px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm" onClick={() => handleComment(post.id)} disabled={!commentIsi[post.id]}>
                     Kirim
                   </button>
                 </div>

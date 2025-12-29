@@ -50,10 +50,10 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="flex flex-col py-0 md:py-8">
+    <div id="page-dashboard" className="flex flex-col py-0 md:py-8">
       <main className="flex-1 mx-auto w-full max-w-5xl px-2 sm:px-6">
         {/* Header */}
-        <div className="rounded-xl mb-6 sm:mb-8">
+        <div id="dashboard-summary" className="rounded-xl mb-6 sm:mb-8">
           <div className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Halo, {username ? username : '...'} 👋</div>
           <div className="bg-[#25E82F]/9 w-full sm:w-fit px-4 sm:px-12 py-3 rounded-lg flex flex-col sm:flex-row justify-center flex-wrap gap-3 sm:gap-6 text-sm sm:text-base">
             <div>
@@ -72,22 +72,22 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-4 sm:mb-6">
+        <div id="dashboard-quick-actions" className="mb-4 sm:mb-6">
           <QuickActions />
         </div>
 
         {/* Box: Riwayat Laporan & Tantangan Aktif */}
-        <div className="flex flex-col md:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="flex-1 mb-4 md:mb-0">
+        <div id="dashboard-widgets" className="flex flex-col md:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div id="dashboard-widget-riwayat" className="flex-1 mb-4 md:mb-0">
             <RiwayatLaporan />
           </div>
-          <div className="flex-1">
+          <div id="dashboard-widget-tantangan" className="flex-1">
             <TantanganAktif />
           </div>
         </div>
 
         {/* Artikel */}
-        <div>
+        <div id="dashboard-artikel-section">
           <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-8">Artikel</h2>
           <ArtikelGrid limit={4} isDashboard={true} />
         </div>

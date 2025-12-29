@@ -76,6 +76,7 @@ export default function VideoSection() {
               <img src={VIDEO_THUMB} alt="Video thumbnail" className="w-full h-full object-cover" draggable={false} />
               <div className="absolute inset-0 bg-black/30 transition"></div>
               <button
+                id="landing-video-play"
                 onClick={() => setPlaying(true)}
                 className="cursor-pointer absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/5 backdrop-blur-[5px] hover:scale-105 transition-transform rounded-full p-6 flex items-center justify-center"
                 aria-label="Play Video"

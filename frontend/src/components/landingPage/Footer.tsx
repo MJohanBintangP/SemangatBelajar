@@ -3,7 +3,7 @@ import bg from '../../assets/bg.svg';
 
 export default function Footer() {
   return (
-    <footer className="relative w-full h-[200px] overflow-hidden mt-40">
+    <footer id="landing-footer" className="relative w-full h-[200px] overflow-hidden mt-40">
       {/* Background image */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-white to-transparent z-10"></div>

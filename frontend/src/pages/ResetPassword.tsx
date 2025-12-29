@@ -126,10 +126,10 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-white">
+    <div id="page-reset-password" className="min-h-screen w-full flex items-center justify-center bg-white">
       <div className="flex justify-between items-center">
         <div className="flex flex-col px-20 lg:px-0">
-          <div onClick={() => navigate('/')} className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer">
+          <div id="reset-back-home" onClick={() => navigate('/')} className="bg-[#008207] w-fit p-3 rounded-full mb-10 cursor-pointer">
             <ArrowLeftIcon color="#ffffff" weight="bold" size={20} />
           </div>
 
@@ -141,10 +141,10 @@ export default function ResetPassword() {
 
           {step === 'email' ? (
             // Form: Masukkan Email
-            <form onSubmit={handleSendOTP} className="w-80">
+            <form id="reset-email-form" onSubmit={handleSendOTP} className="w-80">
               <div className="mb-6">
                 <h3 className="font-medium">Email</h3>
-                <input type="email" placeholder="name@example.com" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <input id="reset-email-input" type="email" placeholder="name@example.com" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
 
               <p className="text-sm text-[#454545] mb-4">
@@ -154,16 +154,17 @@ export default function ResetPassword() {
                 </span>
               </p>
 
-              <button type="submit" disabled={loading} className={`w-full py-2 rounded-full font-semibold text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}>
+              <button id="reset-send-otp" type="submit" disabled={loading} className={`w-full py-2 rounded-full font-semibold text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}>
                 {loading ? 'Mengirim...' : 'Kirim OTP'}
               </button>
             </form>
           ) : (
             // Form: OTP + Password Baru
-            <form onSubmit={handleResetPassword} className="w-80">
+            <form id="reset-otp-form" onSubmit={handleResetPassword} className="w-80">
               <div className="mb-4">
                 <h3 className="font-medium">Kode OTP</h3>
                 <input
+                  id="reset-otp-input"
                   type="text"
                   inputMode="numeric"
                   placeholder="123456"
@@ -176,11 +177,12 @@ export default function ResetPassword() {
               </div>
               <div className="mb-4">
                 <h3 className="font-medium">Password Baru</h3>
-                <input type="password" placeholder="Password baru" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <input id="reset-password-input" type="password" placeholder="Password baru" className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
               <div className="mb-6">
                 <h3 className="font-medium">Konfirmasi Password</h3>
                 <input
+                  id="reset-confirm-password-input"
                   type="password"
                   placeholder="Ulangi password"
                   className="focus:outline-none w-full py-2 border-b border-gray-300 placeholder:text-[#D0D0D0]"
@@ -190,10 +192,10 @@ export default function ResetPassword() {
                 />
               </div>
               <div className="flex gap-3">
-                <button type="button" onClick={() => setStep('email')} className="flex-1 py-2 rounded-full font-semibold text-[#008207] border border-[#008207] hover:bg-[#008207] hover:text-white transition-colors">
+                <button id="reset-back-to-email" type="button" onClick={() => setStep('email')} className="flex-1 py-2 rounded-full font-semibold text-[#008207] border border-[#008207] hover:bg-[#008207] hover:text-white transition-colors">
                   Kembali
                 </button>
-                <button type="submit" disabled={loading} className={`flex-1 py-2 rounded-full font-semibold text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}>
+                <button id="reset-submit" type="submit" disabled={loading} className={`flex-1 py-2 rounded-full font-semibold text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#25E82F] hover:bg-green-700'} transition-colors`}>
                   {loading ? 'Menyimpan...' : 'Reset Password'}
                 </button>
               </div>

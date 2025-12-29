@@ -70,12 +70,12 @@ export default function ArtikelGrid({ limit = 8, isDashboard = false }: ArtikelG
   const containerClasses = isDashboard ? '' : 'py-0 md:py-10 px-4';
 
   return (
-    <div className={containerClasses}>
+    <div id={isDashboard ? 'artikel-grid-dashboard' : 'page-artikel'} className={containerClasses}>
       {!isDashboard && isArtikelPage && <h1 className="text-2xl font-bold mb-4 md:mb-8">Artikel</h1>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div id={isDashboard ? 'artikel-grid-dashboard-list' : 'artikel-grid-list'} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {articles.map((a, idx) => (
-          <a href={a.url} target="_blank" rel="noopener noreferrer" key={idx} className="block bg-white rounded-xl shadow hover:shadow-lg transition p-0 mb-4">
+          <a id={`${isDashboard ? 'artikel-card-dashboard-' : 'artikel-card-'}${idx}`} href={a.url} target="_blank" rel="noopener noreferrer" key={idx} className="block bg-white rounded-xl shadow hover:shadow-lg transition p-0 mb-4">
             {a.urlToImage && <img src={a.urlToImage} alt={a.title} className="w-full h-32 object-cover rounded-t-xl" />}
             <div className="p-4">
               <div className="font-bold text-base mb-1 line-clamp-2">{a.title}</div>

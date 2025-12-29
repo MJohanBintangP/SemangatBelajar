@@ -20,7 +20,7 @@ export default function PengenalanWeb() {
           <p className="text-[#4F4F4F] mb-6 font-medium">
             Ecosteps Report adalah wadah untuk melaporkan berbagai hal yang dapat merusak lingkungan, seperti polusi, deforestasi, pembuangan sampah sembarangan, atau aktivitas ilegal yang membahayakan ekosistem dan lingkungan.{' '}
           </p>
-          <button className="bg-[#009B08] cursor-pointer hover:bg-green-700 duration-200 transition-colors rounded-full px-6 py-2.5 text-white font-medium" onClick={handleButtonClick}>
+          <button id="landing-cta-login" className="bg-[#009B08] cursor-pointer hover:bg-green-700 duration-200 transition-colors rounded-full px-6 py-2.5 text-white font-medium" onClick={handleButtonClick}>
             Coba sekarang
           </button>
         </div>

@@ -274,10 +274,10 @@ export default function Tantangan() {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div id="page-tantangan" className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div id="tantangan-header" className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <Target className="w-8 h-8 text-pink-500" />
             <h1 className="text-3xl font-bold text-gray-800">Tantangan Mingguan</h1>
@@ -286,10 +286,10 @@ export default function Tantangan() {
           {!isAdmin && <div className="mt-3 text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded p-3">ℹ️ Hanya admin yang dapat menandai tantangan selesai.</div>}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div id="tantangan-sections" className="grid md:grid-cols-3 gap-6">
           {/* Leaderboard Section */}
           <div className="md:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
+            <div id="tantangan-leaderboard" className="bg-white rounded-lg shadow-md p-6 sticky top-6">
               <div className="flex items-center gap-2 mb-4">
                 <Trophy className="w-6 h-6 text-yellow-500" />
                 <h2 className="text-xl font-bold text-gray-800">Leaderboard Top 5</h2>
@@ -309,9 +309,9 @@ export default function Tantangan() {
           </div>
 
           {/* Tantangan Section */}
-          <div className="md:col-span-2 space-y-4">
+          <div id="tantangan-list" className="md:col-span-2 space-y-4">
             {tasks.map((t, idx) => (
-              <div key={t.id} className={`bg-white rounded-lg shadow-md p-6 transition ${completed.includes(t.id) ? 'opacity-60 bg-green-50' : ''}`}>
+              <div id={`tantangan-card-${t.id}`} key={t.id} className={`bg-white rounded-lg shadow-md p-6 transition ${completed.includes(t.id) ? 'opacity-60 bg-green-50' : ''}`}>
                 <div className="flex items-start gap-4">
                   <input type="checkbox" checked={completed.includes(t.id)} readOnly className="w-5 h-5 mt-1 accent-green-600 rounded cursor-pointer" />
                   <div className="flex-1">
