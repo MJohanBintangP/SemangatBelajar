@@ -55,7 +55,7 @@ export default function DashboardNavbar() {
       )}
 
       {/* Sidebar Desktop & Tablet */}
-      <div className="hidden md:flex flex-col h-full">
+      <div id="dashboard-navbar-desktop" className="hidden md:flex flex-col h-full">
         {/* Logo & Profil */}
         <div className="flex-shrink-0">
           <img src={logoNavbar} alt="logoNavbar" className="mb-6" />
@@ -69,19 +69,19 @@ export default function DashboardNavbar() {
         </div>
         {/* Menu */}
         <nav className="flex-1 flex flex-col gap-5 px-6 mb-4">
-          <Link to="/Dashboard" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Dashboard') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
+          <Link id="dashboard-nav-dashboard" to="/Dashboard" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Dashboard') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
             <Phospor.HouseSimpleIcon size={20} weight="bold" /> Dashboard
           </Link>
-          <Link to="/Laporan" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Laporan') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
+          <Link id="dashboard-nav-laporan" to="/Laporan" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Laporan') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
             <Phospor.NotePencilIcon size={20} weight="bold" /> Laporan
           </Link>
-          <Link to="/Tantangan" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Tantangan') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
+          <Link id="dashboard-nav-tantangan" to="/Tantangan" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Tantangan') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
             <Phospor.CheckCircleIcon size={20} weight="bold" /> Tantangan
           </Link>
-          <Link to="/Forum" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Forum') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
+          <Link id="dashboard-nav-forum" to="/Forum" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Forum') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
             <Phospor.HandWavingIcon size={20} weight="bold" /> Forum
           </Link>
-          <Link to="/Artikel" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Artikel') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
+          <Link id="dashboard-nav-artikel" to="/Artikel" className={`flex items-center gap-4 py-3 px-4 rounded-lg font-semibold text-green-700 ${isActive('/Artikel') ? 'bg-green-100' : 'hover:bg-green-100'}`}>
             <Phospor.ArticleIcon size={20} weight="bold" /> Artikel
           </Link>
         </nav>
@@ -92,20 +92,20 @@ export default function DashboardNavbar() {
               <div>
                 <h3 className="max-w-[150px] font-medium text-xs mb-2">Buat laporanmu sekarang !</h3>
                 <Link to="/Laporan">
-                  <button className="cursor-pointer text-xs text-[#009B08] bg-white rounded-md px-5 py-1 font-medium">lapor</button>
+                  <button id="dashboard-sidebar-lapor" className="cursor-pointer text-xs text-[#009B08] bg-white rounded-md px-5 py-1 font-medium">lapor</button>
                 </Link>
               </div>
               <img className="ml-auto bottom-26 absolute left-35" src={NotePencil} alt="NotePencil" />
             </div>
           </div>
-          <button onClick={() => setShowConfirm(true)} className="cursor-pointer w-full bg-[#EE0000] text-white py-2 rounded-xl font-semibold hover:bg-red-700">
+          <button id="dashboard-logout" onClick={() => setShowConfirm(true)} className="cursor-pointer w-full bg-[#EE0000] text-white py-2 rounded-xl font-semibold hover:bg-red-700">
             LogOut
           </button>
         </div>
       </div>
 
       {/* Mobile Navbar (Top) */}
-      <div className="fixed md:hidden top-0 left-0 right-0 z-50 bg-white flex flex-col">
+      <div id="dashboard-navbar-mobile" className="fixed md:hidden top-0 left-0 right-0 z-50 bg-white flex flex-col">
         <div className="flex items-center justify-between px-4 py-2 border-b border-b-gray-200">
           <div className="flex items-center gap-3">
             <img src={Profile} alt="Profile" className="w-8 h-8 rounded-full" />
@@ -115,7 +115,7 @@ export default function DashboardNavbar() {
             </div>
           </div>
           {/* Hamburger icon */}
-          <button className="p-2" onClick={() => setShowMobileNav((v) => !v)} aria-label="Menu">
+          <button id="dashboard-navbar-mobile-toggle" className="p-2" onClick={() => setShowMobileNav((v) => !v)} aria-label="Menu">
             <Phospor.List size={28} weight="bold" />
           </button>
         </div>
@@ -125,22 +125,23 @@ export default function DashboardNavbar() {
             {/* Overlay: mulai dari bawah navbar */}
             <div className="fixed left-0 right-0 bottom-0 top-[62px] z-40 bg-black/40" onClick={() => setShowMobileNav(false)} />
             <div className="flex flex-col bg-white border-b border-b-gray-200 shadow-md px-4 py-2 animate-fadeIn z-50 relative">
-              <Link to="/Dashboard" className={`flex items-center gap-2 py-2 ${isActive('/Dashboard') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
+              <Link id="dashboard-nav-dashboard-mobile" to="/Dashboard" className={`flex items-center gap-2 py-2 ${isActive('/Dashboard') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
                 <Phospor.HouseSimpleIcon size={20} weight="bold" /> Dashboard
               </Link>
-              <Link to="/Laporan" className={`flex items-center gap-2 py-2 ${isActive('/Laporan') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
+              <Link id="dashboard-nav-laporan-mobile" to="/Laporan" className={`flex items-center gap-2 py-2 ${isActive('/Laporan') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
                 <Phospor.NotePencilIcon size={20} weight="bold" /> Laporan
               </Link>
-              <Link to="/Tantangan" className={`flex items-center gap-2 py-2 ${isActive('/Tantangan') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
+              <Link id="dashboard-nav-tantangan-mobile" to="/Tantangan" className={`flex items-center gap-2 py-2 ${isActive('/Tantangan') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
                 <Phospor.CheckCircleIcon size={20} weight="bold" /> Tantangan
               </Link>
-              <Link to="/Forum" className={`flex items-center gap-2 py-2 ${isActive('/Forum') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
+              <Link id="dashboard-nav-forum-mobile" to="/Forum" className={`flex items-center gap-2 py-2 ${isActive('/Forum') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
                 <Phospor.HandWavingIcon size={20} weight="bold" /> Forum
               </Link>
-              <Link to="/Artikel" className={`flex items-center gap-2 py-2 ${isActive('/Artikel') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
+              <Link id="dashboard-nav-artikel-mobile" to="/Artikel" className={`flex items-center gap-2 py-2 ${isActive('/Artikel') ? 'text-green-700 font-bold' : 'text-gray-700'}`} onClick={() => setShowMobileNav(false)}>
                 <Phospor.ArticleIcon size={20} weight="bold" /> Artikel
               </Link>
               <button
+                id="dashboard-logout-mobile"
                 onClick={() => {
                   setShowMobileNav(false);
                   setShowConfirm(true);

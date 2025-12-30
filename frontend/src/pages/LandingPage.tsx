@@ -7,13 +7,13 @@ import Footer from '../components/landingPage/Footer';
 
 export default function LandingPage() {
   return (
-    <>
+    <div id="page-landing">
       <Navbar />
       <HeroSection />
       <PengenalanWeb />
       <VideoSection />
       <FiturUtama />
       <Footer />
-    </>
+    </div>
   );
 }

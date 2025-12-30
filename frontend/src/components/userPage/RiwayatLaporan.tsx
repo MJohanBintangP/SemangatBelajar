@@ -36,10 +36,10 @@ export default function RiwayatLaporan() {
   console.log('API BASE URL:', import.meta.env.VITE_API_BASE_URL);
 
   return (
-    <div className="my-4">
+    <div id="widget-riwayat-laporan" className="my-4">
       <div className="bg-white px-10 py-6 rounded-[15px] shadow-md">
         <h3 className="font-bold ">📌 Riwayat Laporan</h3>
-        <ul className="max-h-45 overflow-y-auto text-sm">
+        <ul id="riwayat-laporan-list" className="max-h-45 overflow-y-auto text-sm">
           {loading ? (
             <li className="text-center text-gray-500 py-4">Memuat data...</li>
           ) : laporan.length === 0 ? (

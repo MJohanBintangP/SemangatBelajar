@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../../components/adminPage/AdminNavbar';
 import { useToast } from '../../toast/toast'; // <-- Tambahkan ini
 import ConfirmOverlay from '../../toast/ConfirmOverlay';
-import { X, XIcon } from '@phosphor-icons/react';
+import { XIcon } from '@phosphor-icons/react';
 
 type Laporan = {
   id: number;
@@ -396,7 +396,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="bg-white h-screen flex flex-col md:flex-row overflow-hidden">
+    <div id="page-admin-dashboard" className="bg-white h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Navbar: tampil di semua device, atur tampilannya di dalam AdminNavbar */}
       <AdminNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* Sidebar: hanya tampil di desktop/tablet */}
@@ -404,7 +404,7 @@ export default function AdminDashboard() {
         <div className="h-full flex flex-col overflow-hidden">{/* AdminNavbar sudah dipanggil di luar, tidak perlu di sini */}</div>
       </aside>
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto px-4 md:px-10 py-5 pt-14 md:pt-10">
+      <main id="admin-main" className="flex-1 overflow-y-auto px-4 md:px-10 py-5 pt-14 md:pt-10">
         <div className="py-4 sm:py-8">
           <h2 className="text-lg sm:text-2xl font-bold mb-2 md:mb-4">Dashboard Admin</h2>
           {pesan && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">{pesan}</div>}
@@ -463,7 +463,7 @@ export default function AdminDashboard() {
             <>
               {/* Laporan Tab */}
               {activeTab === 'laporan' && (
-                <div>
+                <div id="admin-tab-laporan">
                   <h3 className="text-2 font-semibold mb-4">Daftar Laporan</h3>
                   <div className="overflow-x-auto rounded-lg shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                     <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">
@@ -597,7 +597,7 @@ export default function AdminDashboard() {
 
               {/* Users Tab */}
               {activeTab === 'users' && (
-                <div>
+                <div id="admin-tab-users">
                   <h3 className="text-xl font-semibold mb-4">Daftar User</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">
@@ -671,7 +671,7 @@ export default function AdminDashboard() {
 
               {/* Forums Tab */}
               {activeTab === 'forums' && (
-                <div>
+                <div id="admin-tab-forums">
                   <h3 className="text-2 font-semibold mb-4">Daftar Forum</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">
@@ -719,7 +719,7 @@ export default function AdminDashboard() {
                 </div>
               )}
               {activeTab === 'forums' && openedForum && (
-                <div className="mt-8 bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                <div id="admin-opened-forum" className="mt-8 bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
                   {/* Header */}
                   <div className="flex items-start justify-between p-4 bg-gradient-to-r from-[#F6FFF5] to-white border-b border-gray-100">
                     <div className="flex items-center gap-3">
@@ -789,7 +789,7 @@ export default function AdminDashboard() {
 
               {/* Tantangan Tab */}
               {activeTab === 'tantangan' && (
-                <div>
+                <div id="admin-tab-tantangan">
                   <h3 className="text-xl font-semibold mb-4">Approval Tantangan User</h3>
                   <div className="overflow-x-auto rounded-lg shadow">
                     <table className="min-w-full bg-white rounded-lg text-xs sm:text-sm">

@@ -84,42 +84,42 @@ export default function BuatLaporan({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-2 sm:px-6">
-      <div className="bg-white rounded-xl p-4 sm:p-8 w-full max-w-xs sm:max-w-md">
+    <div id="buat-laporan-overlay" className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-2 sm:px-6">
+      <div id="buat-laporan-card" className="bg-white rounded-xl p-4 sm:p-8 w-full max-w-xs sm:max-w-md">
         <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Tambah laporan</h2>
 
         {pesan && <div className="mb-4 text-red-600 text-sm">{pesan}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+        <form id="buat-laporan-form" onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <input className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={judul} onChange={(e) => setJudul(e.target.value)} placeholder="Judul" required />
+            <input id="buat-laporan-judul" className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={judul} onChange={(e) => setJudul(e.target.value)} placeholder="Judul" required />
           </div>
 
           <div>
-            <textarea className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white min-h-[80px] sm:min-h-[120px] text-sm" value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} placeholder="Deskripsi" required />
+            <textarea id="buat-laporan-deskripsi" className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white min-h-[80px] sm:min-h-[120px] text-sm" value={deskripsi} onChange={(e) => setDeskripsi(e.target.value)} placeholder="Deskripsi" required />
           </div>
 
           <div>
-            <input type="file" accept="image/*" className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" onChange={handleFotoChange} />
+            <input id="buat-laporan-foto-input" type="file" accept="image/*" className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" onChange={handleFotoChange} />
             {fotoUrl && fotoUrl !== '' && <img src={fotoUrl} alt="Preview" className="mt-2 max-h-32 sm:max-h-40 rounded" />}
           </div>
 
           <div>
-            <input className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="Url video" />
+            <input id="buat-laporan-video-input" className="w-full p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="Url video" />
           </div>
 
           <div className="flex gap-2 mb-8 sm:mb-12 flex-col sm:flex-row">
-            <input className="flex-1 p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={lokasi} readOnly placeholder="Koordinat" />
-            <button type="button" onClick={getLocation} className="px-4 py-2 bg-[#25E82F] text-white rounded-lg font-medium text-sm">
+            <input id="buat-laporan-lokasi" className="flex-1 p-2 sm:p-3 border border-gray-200 rounded-lg bg-white text-sm" value={lokasi} readOnly placeholder="Koordinat" />
+            <button id="buat-laporan-lokasi-btn" type="button" onClick={getLocation} className="px-4 py-2 bg-[#25E82F] text-white rounded-lg font-medium text-sm">
               Ambil lokasi
             </button>
           </div>
 
           <div className="flex gap-3 justify-end mb-0">
-            <button type="button" onClick={handleCancel} className="cursor-pointer px-4 sm:px-6 py-2 border border-gray-200 rounded-lg text-sm">
+            <button id="buat-laporan-cancel" type="button" onClick={handleCancel} className="cursor-pointer px-4 sm:px-6 py-2 border border-gray-200 rounded-lg text-sm">
               Batal
             </button>
-            <button type="submit" className="cursor-pointer bg-[#25E82F] text-white px-4 py-2 rounded-lg font-medium text-sm">
+            <button id="buat-laporan-submit" type="submit" className="cursor-pointer bg-[#25E82F] text-white px-4 py-2 rounded-lg font-medium text-sm">
               Tambah laporan
             </button>
           </div>
